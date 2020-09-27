@@ -1,0 +1,727 @@
+CCS PCH C Compiler, Version 4.104, 5967               23-mars-12 01:39
+
+               Filename: F:\Electro\Programmation\Programmations_PIC_C\243-444-RK\Lab no 8\partie 2\lab8_eeprom.lst
+
+               ROM used: 1400 bytes (4%)
+                         Largest free fragment is 31368
+               RAM used: 9 (0%) at main() level
+                         17 (1%) worst case
+               Stack:    3 locations
+
+*
+0000:  GOTO   046A
+.................... ///////////////////////////////////////////////////////////////////////////////// 
+.................... //                 Applications des microcontrolleurs               243-444-RK // 
+.................... //                         Laboratoire no. 8                                   // 
+.................... //         Programme no 2: Expérimentation avec l'EEPROM 24LC32A               // 
+.................... //                         avec le protocole I²C.                              // 
+.................... //                                                                             // 
+.................... // Le ET-MINI 24XX est un module de EEPROM externe serie utilisant le          // 
+.................... // protocole I²C. On addresse la mémoire voulu en spécifiant son addresse sur  // 
+.................... // le bus I²C.                                                                 // 
+.................... // Addresse sur le Bus: 0xA8,0xAA,0xAC,0xAE                                    // 
+.................... //                                                                             // 
+.................... //  read_ext_eeprom(addr) - pour faire appel à la fonction de lecture sur      // 
+.................... //                          l'EEPROM.                                          // 
+.................... //  write_ext_eeprom(addr,var) - pour faire appel à la fonction d'écriture sur // 
+.................... //                               l'EEPROM.                                     // 
+.................... //                                                                             // 
+.................... ///////////////////////////////////////////////////////////////////////////////// 
+.................... //                                                                             // 
+.................... // Dany Ferron 2012                                                            // 
+.................... //                                                                             // 
+.................... ///////////////////////////////////////////////////////////////////////////////// 
+.................... //                                                                             // 
+.................... //                                                                             // 
+.................... //              _________________                                              // 
+.................... //            -|1              40|-RB7                                         // 
+.................... //            -|                 |-RB6                                         // 
+.................... //            -|    PIC18F4550   |-RB5                                         // 
+.................... //            -|      @20MHz     |-RB4                                         // 
+.................... //            -|                 |-RB3                                         // 
+.................... //            -|                 |-RB2                                         // 
+.................... //            -|                 |-RB1 <-> SLC (serial clock)                  // 
+.................... //            -|                 |-RB0 <-> SDA (serial data)                   // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-RC7/RX <- This is the connection to the     // 
+.................... //            -|                 |-RC6/TX -> MELabs serial LCD controller      // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //         RD0-|                 |-                                            // 
+.................... //         RD1-|20             21|-RD2                                         // 
+.................... //              -----------------                                              // 
+.................... //                                                                             // 
+.................... ///////////////////////////////////////////////////////////////////////////////// 
+....................  
+.................... #include "lab8_eeprom.h" 
+.................... #include <18F4550.h> 
+.................... //////// Standard Header file for the PIC18F4550 device //////////////// 
+.................... #device PIC18F4550 
+.................... #list 
+....................  
+.................... #device adc=8 
+....................  
+.................... #FUSES NOWDT                    //No Watch Dog Timer 
+.................... #FUSES WDT128                   //Watch Dog Timer uses 1:128 Postscale 
+.................... #FUSES HS                       //High speed Osc (> 4mhz) 
+.................... #FUSES NOPROTECT                //Code not protected from reading 
+.................... #FUSES BROWNOUT                 //Reset when brownout detected 
+.................... #FUSES BORV20                   //Brownout reset at 2.0V 
+.................... #FUSES NOPUT                    //No Power Up Timer 
+.................... #FUSES NOCPD                    //No EE protection 
+.................... #FUSES STVREN                   //Stack full/underflow will cause reset 
+.................... #FUSES NODEBUG                  //No Debug mode for ICD 
+.................... #FUSES LVP                      //Low Voltage Programming on B3(PIC16) or B5(PIC18) 
+.................... #FUSES NOWRT                    //Program memory not write protected 
+.................... #FUSES NOWRTD                   //Data EEPROM not write protected 
+.................... #FUSES IESO                     //Internal External Switch Over mode enabled 
+.................... #FUSES FCMEN                    //Fail-safe clock monitor enabled 
+.................... #FUSES PBADEN                   //PORTB pins are configured as analog input channels on RESET 
+.................... #FUSES NOWRTC                   //configuration not registers write protected 
+.................... #FUSES NOWRTB                   //Boot block not write protected 
+.................... #FUSES NOEBTR                   //Memory not protected from table reads 
+.................... #FUSES NOEBTRB                  //Boot block not protected from table reads 
+.................... #FUSES NOCPB                    //No Boot Block code protection 
+.................... #FUSES MCLR                     //Master Clear pin enabled 
+.................... #FUSES LPT1OSC                  //Timer1 configured for low-power operation 
+.................... #FUSES NOXINST                  //Extended set extension and Indexed Addressing mode disabled (Legacy mode) 
+.................... #FUSES PLL12                    //Divide By 12(48MHz oscillator input) 
+.................... #FUSES CPUDIV4                  //System Clock by 4 
+.................... #FUSES USBDIV                   //USB clock source comes from PLL divide by 2 
+.................... #FUSES VREGEN                   //USB voltage regulator enabled 
+.................... #FUSES ICPRT                    //ICPRT enabled 
+....................  
+.................... #use delay(clock=20000000) 
+0444:  CLRF   FEA
+0446:  MOVLW  0A
+0448:  MOVWF  FE9
+044A:  MOVF   FEF,W
+044C:  BZ    0468
+044E:  MOVLW  06
+0450:  MOVWF  01
+0452:  CLRF   00
+0454:  DECFSZ 00,F
+0456:  BRA    0454
+0458:  DECFSZ 01,F
+045A:  BRA    0452
+045C:  MOVLW  7B
+045E:  MOVWF  00
+0460:  DECFSZ 00,F
+0462:  BRA    0460
+0464:  DECFSZ FEF,F
+0466:  BRA    044E
+0468:  RETLW  00
+.................... #use rs232(baud=9600,parity=N,xmit=PIN_C6,rcv=PIN_C7,bits=8) 
+....................  
+....................  
+....................  
+.................... #include "24C32.c" 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... ////   Library for a MicroChip 24C32                                   //// 
+.................... ////                                                                   //// 
+.................... ////   init_ext_eeprom();    Call before the other functions are used  //// 
+.................... ////                                                                   //// 
+.................... ////   write_ext_eeprom(a,d);  Write the byte d to the address a       //// 
+.................... ////                                                                   //// 
+.................... ////   d = read_ext_eeprom(a);  Read the byte d from the address a     //// 
+.................... ////                                                                   //// 
+.................... ////   b = ext_eeprom_ready();  Returns TRUE if the eeprom is ready    //// 
+.................... ////                            to receive opcodes                     //// 
+.................... ////                                                                   //// 
+.................... ////   The main program may define EEPROM_SDA                          //// 
+.................... ////   and EEPROM_SCL to override the defaults below.                  //// 
+.................... ////                                                                   //// 
+.................... ////                            Pin Layout                             //// 
+.................... ////   -----------------------------------------------------------     //// 
+.................... ////   |                                                         |     //// 
+.................... ////   | 1: NC   Not Connected | 8: VCC   +5V                    |     //// 
+.................... ////   |                       |                                 |     //// 
+.................... ////   | 2: NC   Not Connected | 7: WP    GND                    |     //// 
+.................... ////   |                       |                                 |     //// 
+.................... ////   | 3: NC   Not Connected | 6: SCL   EEPROM_SCL and Pull-Up |     //// 
+.................... ////   |                       |                                 |     //// 
+.................... ////   | 4: VSS  GND           | 5: SDA   EEPROM_SDA and Pull-Up |     //// 
+.................... ////   -----------------------------------------------------------     //// 
+.................... ////                                                                   //// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... ////        (C) Copyright 1996, 2003 Custom Computer Services          //// 
+.................... //// This source code may only be used by licensed users of the CCS C  //// 
+.................... //// compiler.  This source code may only be distributed to other      //// 
+.................... //// licensed users of the CCS C compiler.  No other use, reproduction //// 
+.................... //// or distribution is permitted without written permission.          //// 
+.................... //// Derivative programs created using this software in object code    //// 
+.................... //// form are not restricted in any way.                               //// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... ////                                                                   //// 
+.................... ////     Modification pour le module ET-MINI 24XX de EEPROM série      //// 
+.................... ////        par Dany Ferron 2012                                       //// 
+.................... ////                                                                   //// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... // Byte de controle 
+.................... // 
+.................... //  1 -| Ces quatre bit ont toujours cette valeur  
+.................... //     | pour les opérations d'écritures et de 
+.................... //  0 -| lectures. 1010xxxx 
+.................... //     | 
+.................... //  1 -| 
+.................... //     | 
+.................... //  0 -| 
+.................... // 
+.................... //  A2 <-- Un niveau haut sur ce bit spécicifie l'address sur le bus I2C. 
+.................... // 
+.................... //  A1 <-- Un niveau haut sur ce bit spécicifie l'address sur le bus I2C. 
+.................... // 
+.................... //  A0 <-- Un niveau haut sur ce bit spécicifie l'address sur le bus I2C. 
+.................... // 
+.................... //  0 - 1 <-- 1 en lecture, 0 en écriture 
+....................  
+.................... #ifndef EEPROM_SDA 
+....................    #define EEPROM_SDA  PIN_B0 
+....................    #define EEPROM_SCL  PIN_B1 
+.................... #endif 
+....................  
+.................... #use i2c(master, sda=EEPROM_SDA, scl=EEPROM_SCL) 
+*
+0048:  MOVLW  08
+004A:  MOVWF  01
+004C:  MOVLW  05
+004E:  MOVWF  00
+0050:  DECFSZ 00,F
+0052:  BRA    0050
+0054:  BCF    F8A.1
+0056:  BCF    F93.1
+0058:  MOVLW  06
+005A:  MOVWF  00
+005C:  DECFSZ 00,F
+005E:  BRA    005C
+0060:  RLCF   0D,F
+0062:  BCF    F8A.0
+0064:  BTFSC  FD8.0
+0066:  BSF    F93.0
+0068:  BTFSS  FD8.0
+006A:  BCF    F93.0
+006C:  BSF    F93.1
+006E:  BTFSS  F81.1
+0070:  BRA    006E
+0072:  DECFSZ 01,F
+0074:  BRA    004C
+0076:  MOVLW  05
+0078:  MOVWF  00
+007A:  DECFSZ 00,F
+007C:  BRA    007A
+007E:  BCF    F8A.1
+0080:  BCF    F93.1
+0082:  NOP   
+0084:  BSF    F93.0
+0086:  MOVLW  06
+0088:  MOVWF  00
+008A:  DECFSZ 00,F
+008C:  BRA    008A
+008E:  MOVLW  06
+0090:  MOVWF  00
+0092:  DECFSZ 00,F
+0094:  BRA    0092
+0096:  BSF    F93.1
+0098:  BTFSS  F81.1
+009A:  BRA    0098
+009C:  CLRF   01
+009E:  MOVLW  06
+00A0:  MOVWF  00
+00A2:  DECFSZ 00,F
+00A4:  BRA    00A2
+00A6:  BTFSC  F81.0
+00A8:  BSF    01.0
+00AA:  BCF    F8A.1
+00AC:  BCF    F93.1
+00AE:  BCF    F8A.0
+00B0:  BCF    F93.0
+00B2:  RETLW  00
+*
+0192:  MOVLW  08
+0194:  MOVWF  0D
+0196:  MOVFF  00,0E
+019A:  BSF    F93.0
+019C:  MOVLW  06
+019E:  MOVWF  00
+01A0:  DECFSZ 00,F
+01A2:  BRA    01A0
+01A4:  BSF    F93.1
+01A6:  BTFSS  F81.1
+01A8:  BRA    01A6
+01AA:  BTFSC  F81.0
+01AC:  BSF    FD8.0
+01AE:  BTFSS  F81.0
+01B0:  BCF    FD8.0
+01B2:  RLCF   01,F
+01B4:  MOVLW  05
+01B6:  MOVWF  00
+01B8:  DECFSZ 00,F
+01BA:  BRA    01B8
+01BC:  BCF    F93.1
+01BE:  BCF    F8A.1
+01C0:  DECFSZ 0D,F
+01C2:  BRA    019A
+01C4:  BSF    F93.0
+01C6:  MOVLW  06
+01C8:  MOVWF  00
+01CA:  DECFSZ 00,F
+01CC:  BRA    01CA
+01CE:  BCF    F8A.0
+01D0:  MOVF   0E,W
+01D2:  BTFSS  FD8.2
+01D4:  BCF    F93.0
+01D6:  NOP   
+01D8:  BSF    F93.1
+01DA:  BTFSS  F81.1
+01DC:  BRA    01DA
+01DE:  MOVLW  05
+01E0:  MOVWF  00
+01E2:  DECFSZ 00,F
+01E4:  BRA    01E2
+01E6:  BCF    F8A.1
+01E8:  BCF    F93.1
+01EA:  MOVLW  06
+01EC:  MOVWF  00
+01EE:  DECFSZ 00,F
+01F0:  BRA    01EE
+01F2:  BCF    F8A.0
+01F4:  BCF    F93.0
+01F6:  GOTO   0284 (RETURN)
+....................  
+.................... #define hi(x) (*((int8 *) &x + 1)) // Macro servant à garder HAUT octet du mot. 
+....................  
+.................... #define WRITE_BIT 1 
+.................... // Addresse sur le Bus. 
+.................... #define I2C_ADDRESS_EEPROM_1 0xA8 // ByteID = 1010 1000 
+.................... #define I2C_ADDRESS_EEPROM_2 0xAA // ByteID = 1010 1010 
+.................... #define I2C_ADDRESS_EEPROM_3 0xAC // ByteID = 1010 1100 
+.................... #define I2C_ADDRESS_EEPROM_4 0xAE // ByteID = 1010 1110 
+.................... //#define EEPROM_ADDRESS long int 
+.................... //#define EEPROM_SIZE    4096 
+....................  
+.................... // Génère un état d'haute impédance sur les lignes I2C. 
+.................... void init_ext_eeprom()  
+.................... { 
+....................    output_float(EEPROM_SCL); 
+*
+0040:  BSF    F93.1
+....................    output_float(EEPROM_SDA); 
+0042:  BSF    F93.0
+.................... } 
+0044:  GOTO   0492 (RETURN)
+.................... // Fonction servant à générer le Bit ACK requis à la fin de chaque opération  
+.................... // d'écriture/lecture dans la EEPROM externe. Ce Bit est fournis avec un coup 
+.................... // d'horloge suplémentaire générer par le Master(le microprocesseur) après la  
+.................... // réception de chaque Byte. 
+.................... BOOLEAN ext_eeprom_ready()  
+.................... {   
+....................    int1 ack; 
+....................     
+....................    i2c_start();            // If the write command is acknowledged, 
+*
+00B4:  BSF    F93.0
+00B6:  MOVLW  05
+00B8:  MOVWF  00
+00BA:  DECFSZ 00,F
+00BC:  BRA    00BA
+00BE:  BSF    F93.1
+00C0:  MOVLW  06
+00C2:  MOVWF  00
+00C4:  DECFSZ 00,F
+00C6:  BRA    00C4
+00C8:  BCF    F8A.0
+00CA:  BCF    F93.0
+00CC:  MOVLW  05
+00CE:  MOVWF  00
+00D0:  DECFSZ 00,F
+00D2:  BRA    00D0
+00D4:  BCF    F8A.1
+00D6:  BCF    F93.1
+....................    ack = i2c_write(I2C_ADDRESS_EEPROM_1);  // then the device is ready. 
+00D8:  MOVLW  A8
+00DA:  MOVWF  0D
+00DC:  RCALL  0048
+00DE:  MOVF   01,W
+00E0:  BCF    0C.0
+00E2:  BTFSC  01.0
+00E4:  BSF    0C.0
+....................    i2c_stop(); 
+00E6:  BCF    F93.0
+00E8:  NOP   
+00EA:  BSF    F93.1
+00EC:  BTFSS  F81.1
+00EE:  BRA    00EC
+00F0:  MOVLW  05
+00F2:  MOVWF  00
+00F4:  DECFSZ 00,F
+00F6:  BRA    00F4
+00F8:  BRA    00FA
+00FA:  NOP   
+00FC:  BSF    F93.0
+00FE:  MOVLW  05
+0100:  MOVWF  00
+0102:  DECFSZ 00,F
+0104:  BRA    0102
+....................     
+....................    return !ack; 
+0106:  MOVLW  00
+0108:  BTFSS  0C.0
+010A:  MOVLW  01
+010C:  MOVWF  01
+.................... } 
+010E:  RETLW  00
+....................  
+.................... void write_ext_eeprom(long int address, BYTE data)  
+.................... { 
+....................    while(!ext_eeprom_ready()); // S'assure que le bit ACK à été généré avant l'opération. 
+0110:  RCALL  00B4
+0112:  MOVF   01,F
+0114:  BZ    0110
+....................        
+....................    i2c_start(); 
+0116:  BSF    F93.0
+0118:  MOVLW  05
+011A:  MOVWF  00
+011C:  DECFSZ 00,F
+011E:  BRA    011C
+0120:  BSF    F93.1
+0122:  MOVLW  06
+0124:  MOVWF  00
+0126:  DECFSZ 00,F
+0128:  BRA    0126
+012A:  BCF    F8A.0
+012C:  BCF    F93.0
+012E:  MOVLW  05
+0130:  MOVWF  00
+0132:  DECFSZ 00,F
+0134:  BRA    0132
+0136:  BCF    F8A.1
+0138:  BCF    F93.1
+....................    i2c_write(I2C_ADDRESS_EEPROM_1); // Byte de controle incluant l'addresse sur le Bus. 
+013A:  MOVLW  A8
+013C:  MOVWF  0D
+013E:  RCALL  0048
+....................    i2c_write(hi(address)); // Écriture du HAUT octet du mot de l'addresse mémoire.  
+0140:  CLRF   0D
+0142:  MOVLW  09
+0144:  MOVWF  0C
+0146:  MOVLW  01
+0148:  ADDWF  0C,W
+014A:  MOVWF  01
+014C:  MOVLW  00
+014E:  ADDWFC 0D,W
+0150:  MOVWF  03
+0152:  MOVFF  01,FE9
+0156:  MOVWF  FEA
+0158:  MOVFF  FEF,0C
+015C:  MOVFF  0C,0D
+0160:  RCALL  0048
+....................    i2c_write(address); // Écriture du BAS octet du mot de l'addresse mémoire. 
+0162:  MOVFF  09,0D
+0166:  RCALL  0048
+....................    i2c_write(data); // Écriture de la donnée recue du programme principal. 
+0168:  MOVFF  0B,0D
+016C:  RCALL  0048
+....................    i2c_stop(); 
+016E:  BCF    F93.0
+0170:  NOP   
+0172:  BSF    F93.1
+0174:  BTFSS  F81.1
+0176:  BRA    0174
+0178:  MOVLW  05
+017A:  MOVWF  00
+017C:  DECFSZ 00,F
+017E:  BRA    017C
+0180:  BRA    0182
+0182:  NOP   
+0184:  BSF    F93.0
+0186:  MOVLW  05
+0188:  MOVWF  00
+018A:  DECFSZ 00,F
+018C:  BRA    018A
+....................  
+....................  
+.................... } 
+018E:  GOTO   04C0 (RETURN)
+....................  
+....................  
+.................... BYTE read_ext_eeprom(long int address)  
+.................... { 
+....................    BYTE data; 
+....................  
+....................    while(!ext_eeprom_ready()); // S'assure que le bit ACK à été généré avant l'opération. 
+*
+01FA:  RCALL  00B4
+01FC:  MOVF   01,F
+01FE:  BZ    01FA
+....................     
+....................    i2c_start(); 
+0200:  BSF    F93.0
+0202:  MOVLW  05
+0204:  MOVWF  00
+0206:  DECFSZ 00,F
+0208:  BRA    0206
+020A:  BSF    F93.1
+020C:  MOVLW  06
+020E:  MOVWF  00
+0210:  DECFSZ 00,F
+0212:  BRA    0210
+0214:  BCF    F8A.0
+0216:  BCF    F93.0
+0218:  MOVLW  05
+021A:  MOVWF  00
+021C:  DECFSZ 00,F
+021E:  BRA    021C
+0220:  BCF    F8A.1
+0222:  BCF    F93.1
+....................    i2c_write(I2C_ADDRESS_EEPROM_1); // Byte de controle incluant l'addresse sur le Bus. 
+0224:  MOVLW  A8
+0226:  MOVWF  0D
+0228:  RCALL  0048
+....................    i2c_write(hi(address)); // Écriture du HAUT octet du mot de l'addresse mémoire. 
+022A:  CLRF   0D
+022C:  MOVLW  09
+022E:  MOVWF  0C
+0230:  MOVLW  01
+0232:  ADDWF  0C,W
+0234:  MOVWF  01
+0236:  MOVLW  00
+0238:  ADDWFC 0D,W
+023A:  MOVWF  03
+023C:  MOVFF  01,FE9
+0240:  MOVWF  FEA
+0242:  MOVFF  FEF,0C
+0246:  MOVFF  0C,0D
+024A:  RCALL  0048
+....................    i2c_write(address); // Écriture du BAS octet du mot de l'addresse mémoire. 
+024C:  MOVFF  09,0D
+0250:  RCALL  0048
+....................    i2c_start(); 
+0252:  BSF    F93.0
+0254:  MOVLW  05
+0256:  MOVWF  00
+0258:  DECFSZ 00,F
+025A:  BRA    0258
+025C:  BSF    F93.1
+025E:  MOVLW  06
+0260:  MOVWF  00
+0262:  DECFSZ 00,F
+0264:  BRA    0262
+0266:  BTFSS  F81.1
+0268:  BRA    0266
+026A:  BCF    F8A.0
+026C:  BCF    F93.0
+026E:  MOVLW  05
+0270:  MOVWF  00
+0272:  DECFSZ 00,F
+0274:  BRA    0272
+0276:  BCF    F8A.1
+0278:  BCF    F93.1
+....................    i2c_write(I2C_ADDRESS_EEPROM_1+WRITE_BIT); // Byte de controle signalant la lecture. 
+027A:  MOVLW  A9
+027C:  MOVWF  0D
+027E:  RCALL  0048
+....................    data=i2c_read(0); // Lecture de l'octet en mémoire. 
+0280:  CLRF   00
+0282:  BRA    0192
+0284:  MOVFF  01,0B
+....................    i2c_stop(); 
+0288:  BCF    F93.0
+028A:  NOP   
+028C:  BSF    F93.1
+028E:  BTFSS  F81.1
+0290:  BRA    028E
+0292:  MOVLW  05
+0294:  MOVWF  00
+0296:  DECFSZ 00,F
+0298:  BRA    0296
+029A:  BRA    029C
+029C:  NOP   
+029E:  BSF    F93.0
+02A0:  MOVLW  05
+02A2:  MOVWF  00
+02A4:  DECFSZ 00,F
+02A6:  BRA    02A4
+....................     
+....................    return(data); // Retour de l'octet vers le programme l'appelant. 
+02A8:  MOVFF  0B,01
+.................... } 
+02AC:  GOTO   04E6 (RETURN)
+....................  
+....................  
+....................  
+.................... void main() 
+.................... { 
+*
+046A:  CLRF   FF8
+046C:  BCF    FD0.7
+046E:  CLRF   FEA
+0470:  CLRF   FE9
+0472:  BSF    FB8.3
+0474:  MOVLW  08
+0476:  MOVWF  FAF
+0478:  MOVLW  02
+047A:  MOVWF  FB0
+047C:  MOVLW  A6
+047E:  MOVWF  FAC
+0480:  MOVLW  90
+0482:  MOVWF  FAB
+0484:  MOVF   FC1,W
+0486:  ANDLW  C0
+0488:  IORLW  0F
+048A:  MOVWF  FC1
+048C:  MOVLW  07
+048E:  MOVWF  FB4
+....................    BYTE value; 
+....................    BYTE valeur; 
+....................    signed long i; 
+....................     
+....................    init_ext_eeprom(); 
+0490:  BRA    0040
+....................     
+....................     
+....................    for(i = 0; i <= 254; ++i) // de 0 à 254 
+0492:  CLRF   08
+0494:  CLRF   07
+0496:  BTFSC  08.7
+0498:  BRA    04A4
+049A:  MOVF   08,F
+049C:  BNZ   04C8
+049E:  MOVF   07,W
+04A0:  SUBLW  FE
+04A2:  BNC   04C8
+....................    {       
+....................       value = i + 10; 
+04A4:  MOVLW  0A
+04A6:  ADDWF  07,W
+04A8:  MOVWF  01
+04AA:  MOVLW  00
+04AC:  ADDWFC 08,W
+04AE:  MOVFF  01,05
+....................        
+....................       write_ext_eeprom(i,value); 
+04B2:  MOVFF  08,0A
+04B6:  MOVFF  07,09
+04BA:  MOVFF  05,0B
+04BE:  BRA    0110
+....................        
+....................    } 
+04C0:  INCF   07,F
+04C2:  BTFSC  FD8.2
+04C4:  INCF   08,F
+04C6:  BRA    0496
+....................        
+....................    while (TRUE) 
+....................    { 
+....................       for(i = 254; i >= 0; --i) // de 254 à 0 
+04C8:  CLRF   08
+04CA:  MOVLW  FE
+04CC:  MOVWF  07
+04CE:  BTFSC  08.7
+04D0:  BRA    0566
+04D2:  BRA    04D4
+....................       { 
+....................       printf("\f"); 
+04D4:  MOVLW  0C
+04D6:  BTFSS  F9E.4
+04D8:  BRA    04D6
+04DA:  MOVWF  FAD
+....................       valeur = read_ext_eeprom(i); 
+04DC:  MOVFF  08,0A
+04E0:  MOVFF  07,09
+04E4:  BRA    01FA
+04E6:  MOVFF  01,06
+....................        
+....................       printf("%c%c",0xfe,0xc0); 
+04EA:  MOVLW  FE
+04EC:  BTFSS  F9E.4
+04EE:  BRA    04EC
+04F0:  MOVWF  FAD
+04F2:  MOVLW  C0
+04F4:  BTFSS  F9E.4
+04F6:  BRA    04F4
+04F8:  MOVWF  FAD
+....................       printf("A l'adresse %3Ld la",i); 
+04FA:  MOVLW  04
+04FC:  MOVWF  FF6
+04FE:  MOVLW  00
+0500:  MOVWF  FF7
+0502:  MOVLW  0C
+0504:  MOVWF  09
+0506:  RCALL  02B0
+0508:  MOVLW  03
+050A:  MOVWF  FE9
+050C:  MOVFF  08,0A
+0510:  MOVFF  07,09
+0514:  BRA    02D0
+0516:  MOVLW  20
+0518:  BTFSS  F9E.4
+051A:  BRA    0518
+051C:  MOVWF  FAD
+051E:  MOVLW  6C
+0520:  BTFSS  F9E.4
+0522:  BRA    0520
+0524:  MOVWF  FAD
+0526:  MOVLW  61
+0528:  BTFSS  F9E.4
+052A:  BRA    0528
+052C:  MOVWF  FAD
+....................       printf("%c%c",0xfe,0x94); 
+052E:  MOVLW  FE
+0530:  BTFSS  F9E.4
+0532:  BRA    0530
+0534:  MOVWF  FAD
+0536:  MOVLW  94
+0538:  BTFSS  F9E.4
+053A:  BRA    0538
+053C:  MOVWF  FAD
+....................       printf("valeur a 10 de plus\n\r c'est a dire %3u",valeur); 
+053E:  MOVLW  18
+0540:  MOVWF  FF6
+0542:  MOVLW  00
+0544:  MOVWF  FF7
+0546:  MOVLW  23
+0548:  MOVWF  09
+054A:  RCALL  02B0
+054C:  MOVFF  06,09
+0550:  MOVLW  13
+0552:  MOVWF  0A
+0554:  BRA    03D6
+....................        
+....................       delay_ms(250); 
+0556:  MOVLW  FA
+0558:  MOVWF  0A
+055A:  RCALL  0444
+....................       } 
+055C:  MOVF   07,W
+055E:  BTFSC  FD8.2
+0560:  DECF   08,F
+0562:  DECF   07,F
+0564:  BRA    04CE
+....................        
+....................    delay_ms(1000);    
+0566:  MOVLW  04
+0568:  MOVWF  09
+056A:  MOVLW  FA
+056C:  MOVWF  0A
+056E:  RCALL  0444
+0570:  DECFSZ 09,F
+0572:  BRA    056A
+....................    } 
+0574:  BRA    04C8
+.................... }  
+0576:  SLEEP 
+
+Configuration Fuses:
+   Word  1: CC3F   IESO FCMEN HS PLL12 CPUDIV4 USBDIV
+   Word  2: 0E3F   BROWNOUT WDT128 NOWDT BORV20 NOPUT VREGEN
+   Word  3: 8700   PBADEN CCP2C1 MCLR LPT1OSC
+   Word  4: 00A5   STVREN NODEBUG LVP NOXINST ICPRT
+   Word  5: C00F   NOPROTECT NOCPD NOCPB
+   Word  6: E00F   NOWRT NOWRTD NOWRTC NOWRTB
+   Word  7: 400F   NOEBTR NOEBTRB

@@ -1,0 +1,86 @@
+/////////////////////////////////////////////////////////////////////////////////
+//                 Applications des microcontrolleurs               243-444-RK //
+//                         Laboratoire no. 8                                   //
+//         Programme no 2: Expérimentation avec l'EEPROM 24LC32A               //
+//                         avec le protocole I²C.                              //
+//                                                                             //
+// Le ET-MINI 24XX est un module de EEPROM externe serie utilisant le          //
+// protocole I²C. On addresse la mémoire voulu en spécifiant son addresse sur  //
+// le bus I²C.                                                                 //
+// Addresse sur le Bus: 0xA8,0xAA,0xAC,0xAE                                    //
+//                                                                             //
+//  read_ext_eeprom(addr) - pour faire appel à la fonction de lecture sur      //
+//                          l'EEPROM.                                          //
+//  write_ext_eeprom(addr,var) - pour faire appel à la fonction d'écriture sur //
+//                               l'EEPROM.                                     //
+//                                                                             //
+/////////////////////////////////////////////////////////////////////////////////
+//                                                                             //
+// Dany Ferron 2012                                                            //
+//                                                                             //
+/////////////////////////////////////////////////////////////////////////////////
+//                                                                             //
+//                                                                             //
+//              _________________                                              //
+//            -|1              40|-RB7                                         //
+//            -|                 |-RB6                                         //
+//            -|    PIC18F4550   |-RB5                                         //
+//            -|      @20MHz     |-RB4                                         //
+//            -|                 |-RB3                                         //
+//            -|                 |-RB2                                         //
+//            -|                 |-RB1 <-> SLC (serial clock)                  //
+//            -|                 |-RB0 <-> SDA (serial data)                   //
+//            -|                 |-                                            //
+//            -|                 |-                                            //
+//            -|                 |-                                            //
+//            -|                 |-                                            //
+//            -|                 |-                                            //
+//            -|                 |-                                            //
+//            -|                 |-RC7/RX <- This is the connection to the     //
+//            -|                 |-RC6/TX -> MELabs serial LCD controller      //
+//            -|                 |-                                            //
+//            -|                 |-                                            //
+//         RD0-|                 |-                                            //
+//         RD1-|20             21|-RD2                                         //
+//              -----------------                                              //
+//                                                                             //
+/////////////////////////////////////////////////////////////////////////////////
+
+#include "lab8_eeprom.h"
+#include "24C32.c"
+
+void main()
+{
+   BYTE value;
+   BYTE valeur;
+   signed long i;
+   
+   init_ext_eeprom();
+   
+   
+   for(i = 0; i <= 254; ++i) // de 0 à 254
+   {      
+      value = i + 10;
+      
+      write_ext_eeprom(i,value);
+      
+   }
+      
+   while (TRUE)
+   {
+      for(i = 254; i >= 0; --i) // de 254 à 0
+      {
+      printf("\f");
+      valeur = read_ext_eeprom(i);
+      
+      printf("%c%c",0xfe,0xc0);
+      printf("A l'adresse %3Ld la",i);
+      printf("%c%c",0xfe,0x94);
+      printf("valeur a 10 de plus\n\r c'est a dire %3u",valeur);
+      
+      delay_ms(250);
+      }
+      
+   delay_ms(1000);   
+   }
+} 

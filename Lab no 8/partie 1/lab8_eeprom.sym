@@ -1,0 +1,89 @@
+000     @SCRATCH
+001     @SCRATCH
+001     _RETURN_
+002     @SCRATCH
+003     @SCRATCH
+005     main.value
+006     main.valeur
+007-008 main.i
+009     @PRINTF_U_9600_31766_31767.P1
+009-00A @PRINTF_LD_9600_31766_31767.P2
+009     @PSTRINGCN_9600_31766_31767.P3
+009     main.@SCRATCH1
+00A     @delay_ms1.P1
+00A     @PRINTF_U_9600_31766_31767.P2
+00A     @PSTRINGCN_9600_31766_31767.@SCRATCH1
+00B     @DIV88.P1
+00B     @PSTRINGCN_9600_31766_31767.@SCRATCH2
+00B     @PRINTF_LD_9600_31766_31767.@SCRATCH1
+00C     @DIV88.P1
+00C     @PRINTF_LD_9600_31766_31767.@SCRATCH2
+00D     @PRINTF_LD_9600_31766_31767.@SCRATCH3
+00D     @DIV88.@SCRATCH1
+00E     @PRINTF_LD_9600_31766_31767.@SCRATCH4
+00F     @PRINTF_LD_9600_31766_31767.@SCRATCH5
+010     @PRINTF_LD_9600_31766_31767.@SCRATCH6
+011     @PRINTF_LD_9600_31766_31767.@SCRATCH7
+F83     PSP_DATA
+FB4.6   C1OUT
+FB4.7   C2OUT
+FBB     CCP_2
+FBB     CCP_2_LOW
+FBC     CCP_2_HIGH
+FBE     CCP_1_LOW
+FBE     CCP_1
+FBF     CCP_1_HIGH
+FE1-FE2 @READ_PACKED_MEMORY.P1
+FE1-FE2 @WRITE_PACKED_MEMORY.P2
+FE9-FEA @WRITE_PROGRAM_MEMORY.P1
+FE9-FEA @WRITE_PACKED_MEMORY.P2
+FE9-FEA @READ_PROGRAM_MEMORY.P3
+FE9-FEA @READ_PACKED_MEMORY.P4
+FF6-FF8 @READ_PROGRAM_MEMORY.P1
+FF6-FF8 @WRITE_PROGRAM_MEMORY.P2
+
+ROM Allocation:
+01D4  @delay_ms1
+01FA  main
+0004  @const78
+0040  @PSTRINGCN_9600_31766_31767
+0060  @PRINTF_LD_9600_31766_31767
+0018  @const84
+013E  @DIV88
+0166  @PRINTF_U_9600_31766_31767
+01FA  @cinit
+
+
+User Memory space: 
+
+User Memory space: 
+
+Project Directory:
+    F:\Electro\Programmation\Programmations_PIC_C\243-444-RK\Lab no 8\partie 1\
+
+Project Files:
+    lab8_eeprom.c
+    lab8_eeprom.h
+    C:\Program Files\PICC\devices\18F4550.h
+
+Units:
+    F:\Electro\Programmation\Programmations_PIC_C\243-444-RK\Lab no 8\partie 1\lab8_eeprom (main)
+
+Compiler Settings:
+    Processor:      PIC18F4550
+    Pointer Size:   16
+    ADC Range:      0-255
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+
+Output Files:
+    Errors:      lab8_eeprom.err
+    Ext Symbols: lab8_eeprom.esym
+    INHX32:      lab8_eeprom.hex
+    Symbols:     lab8_eeprom.sym
+    List:        lab8_eeprom.lst
+    Debug/COFF:  lab8_eeprom.cof
+    Project:     lab8_eeprom.PJT
+    Call Tree:   lab8_eeprom.tre
+    Statistics:  lab8_eeprom.sta

@@ -1,0 +1,11 @@
+ÀÄlab8_eeprom
+   ÀÄmain  0/382  Ram=5
+      ÃÄ??0??
+      ÃÄ@PSTRINGCN_9600_31766_31767  0/32  Ram=3
+      ÃÄ@PRINTF_LD_9600_31766_31767  0/222  Ram=9
+      ÃÄ@PSTRINGCN_9600_31766_31767  0/32  Ram=3
+      ÃÄ@PRINTF_U_9600_31766_31767  0/110  Ram=2
+      ³  ÃÄ@DIV88  0/40  Ram=3
+      ³  ÀÄ@DIV88  0/40  Ram=3
+      ÃÄ@delay_ms1  0/38  Ram=1
+      ÀÄ@delay_ms1  0/38  Ram=1

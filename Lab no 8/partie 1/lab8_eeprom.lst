@@ -1,0 +1,348 @@
+CCS PCH C Compiler, Version 4.104, 5967               22-mars-12 17:17
+
+               Filename: F:\Electro\Programmation\Programmations_PIC_C\243-444-RK\Lab no 8\partie 1\lab8_eeprom.lst
+
+               ROM used: 888 bytes (3%)
+                         Largest free fragment is 31880
+               RAM used: 9 (0%) at main() level
+                         17 (1%) worst case
+               Stack:    2 locations
+
+*
+0000:  GOTO   01FA
+.................... ///////////////////////////////////////////////////////////////////////////////// 
+.................... //                 Applications des microcontrolleurs               243-444-RK // 
+.................... //                         Laboratoire no. 8                                   // 
+.................... //         Programme no 1: Expérimentation avec la mémoire EEPROM interne      // 
+.................... //                         du microcontrolleur 18F4550                         // 
+.................... //                                                                             // 
+.................... //  read_eeprom(addr) - pour faire appel à la fonction de lecture sur l'EEPROM // 
+.................... //  write_eeprom(addr,var) - pour faire appel à la fonction d'écriture sur     // 
+.................... //                           l'EEPROM                                          // 
+.................... //                                                                             // 
+.................... ///////////////////////////////////////////////////////////////////////////////// 
+.................... //                                                                             // 
+.................... // Dany Ferron 2012                                                            // 
+.................... //                                                                             // 
+.................... ///////////////////////////////////////////////////////////////////////////////// 
+.................... //                                                                             // 
+.................... //                                                                             // 
+.................... //              _________________                                              // 
+.................... //            -|1              40|-RB7                                         // 
+.................... //            -|                 |-RB6                                         // 
+.................... //            -|    PIC18F4550   |-RB5                                         // 
+.................... //            -|      @20MHz     |-RB4                                         // 
+.................... //            -|                 |-RB3                                         // 
+.................... //            -|                 |-RB2                                         // 
+.................... //            -|                 |-RB1                                         // 
+.................... //            -|                 |-RB0                                         // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-RC7/RX <- This is the connection to the     // 
+.................... //            -|                 |-RC6/TX -> MELabs serial LCD controller      // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //         RD0-|                 |-                                            // 
+.................... //         RD1-|20             21|-RD2                                         // 
+.................... //              -----------------                                              // 
+.................... //                                                                             // 
+.................... ///////////////////////////////////////////////////////////////////////////////// 
+....................  
+.................... #include "lab8_eeprom.h" 
+.................... #include <18F4550.h> 
+.................... //////// Standard Header file for the PIC18F4550 device //////////////// 
+.................... #device PIC18F4550 
+.................... #list 
+....................  
+.................... #device adc=8 
+....................  
+.................... #FUSES NOWDT                    //No Watch Dog Timer 
+.................... #FUSES WDT128                   //Watch Dog Timer uses 1:128 Postscale 
+.................... #FUSES HS                       //High speed Osc (> 4mhz) 
+.................... #FUSES NOPROTECT                //Code not protected from reading 
+.................... #FUSES BROWNOUT                 //Reset when brownout detected 
+.................... #FUSES BORV20                   //Brownout reset at 2.0V 
+.................... #FUSES NOPUT                    //No Power Up Timer 
+.................... #FUSES NOCPD                    //No EE protection 
+.................... #FUSES STVREN                   //Stack full/underflow will cause reset 
+.................... #FUSES NODEBUG                  //No Debug mode for ICD 
+.................... #FUSES LVP                      //Low Voltage Programming on B3(PIC16) or B5(PIC18) 
+.................... #FUSES NOWRT                    //Program memory not write protected 
+.................... #FUSES NOWRTD                   //Data EEPROM not write protected 
+.................... #FUSES IESO                     //Internal External Switch Over mode enabled 
+.................... #FUSES FCMEN                    //Fail-safe clock monitor enabled 
+.................... #FUSES PBADEN                   //PORTB pins are configured as analog input channels on RESET 
+.................... #FUSES NOWRTC                   //configuration not registers write protected 
+.................... #FUSES NOWRTB                   //Boot block not write protected 
+.................... #FUSES NOEBTR                   //Memory not protected from table reads 
+.................... #FUSES NOEBTRB                  //Boot block not protected from table reads 
+.................... #FUSES NOCPB                    //No Boot Block code protection 
+.................... #FUSES MCLR                     //Master Clear pin enabled 
+.................... #FUSES LPT1OSC                  //Timer1 configured for low-power operation 
+.................... #FUSES NOXINST                  //Extended set extension and Indexed Addressing mode disabled (Legacy mode) 
+.................... #FUSES PLL12                    //Divide By 12(48MHz oscillator input) 
+.................... #FUSES CPUDIV4                  //System Clock by 4 
+.................... #FUSES USBDIV                   //USB clock source comes from PLL divide by 2 
+.................... #FUSES VREGEN                   //USB voltage regulator enabled 
+.................... #FUSES ICPRT                    //ICPRT enabled 
+....................  
+.................... #use delay(clock=20000000) 
+01D4:  CLRF   FEA
+01D6:  MOVLW  0A
+01D8:  MOVWF  FE9
+01DA:  MOVF   FEF,W
+01DC:  BZ    01F8
+01DE:  MOVLW  06
+01E0:  MOVWF  01
+01E2:  CLRF   00
+01E4:  DECFSZ 00,F
+01E6:  BRA    01E4
+01E8:  DECFSZ 01,F
+01EA:  BRA    01E2
+01EC:  MOVLW  7B
+01EE:  MOVWF  00
+01F0:  DECFSZ 00,F
+01F2:  BRA    01F0
+01F4:  DECFSZ FEF,F
+01F6:  BRA    01DE
+01F8:  RETLW  00
+.................... #use rs232(baud=9600,parity=N,xmit=PIN_C6,rcv=PIN_C7,bits=8) 
+....................  
+....................  
+....................  
+....................  
+.................... void main() 
+.................... { 
+01FA:  CLRF   FF8
+01FC:  BCF    FD0.7
+01FE:  CLRF   FEA
+0200:  CLRF   FE9
+0202:  BSF    FB8.3
+0204:  MOVLW  08
+0206:  MOVWF  FAF
+0208:  MOVLW  02
+020A:  MOVWF  FB0
+020C:  MOVLW  A6
+020E:  MOVWF  FAC
+0210:  MOVLW  90
+0212:  MOVWF  FAB
+0214:  MOVF   FC1,W
+0216:  ANDLW  C0
+0218:  IORLW  0F
+021A:  MOVWF  FC1
+021C:  MOVLW  07
+021E:  MOVWF  FB4
+....................    BYTE value, valeur; 
+....................    signed long i; 
+....................     
+....................    setup_adc_ports(NO_ANALOGS|VSS_VDD); 
+0220:  MOVF   FC1,W
+0222:  ANDLW  C0
+0224:  IORLW  0F
+0226:  MOVWF  FC1
+....................    setup_adc(ADC_OFF); 
+0228:  BCF    FC2.0
+....................    setup_psp(PSP_DISABLED); 
+022A:  BCF    F96.4
+....................    setup_spi(FALSE); 
+022C:  CLRF   FC6
+....................    setup_wdt(WDT_OFF); 
+022E:  BCF    FD1.0
+....................    setup_timer_0(RTCC_INTERNAL); 
+0230:  MOVLW  80
+0232:  MOVWF  FD5
+....................    setup_timer_1(T1_DISABLED); 
+0234:  CLRF   FCD
+....................    setup_timer_2(T2_DISABLED,0,1); 
+0236:  MOVLW  00
+0238:  MOVWF  FCA
+023A:  MOVLW  00
+023C:  MOVWF  FCB
+....................    setup_comparator(NC_NC_NC_NC); 
+023E:  MOVLW  07
+0240:  MOVWF  FB4
+0242:  MOVF   F92,W
+0244:  MOVWF  F92
+0246:  MOVLW  10
+0248:  MOVWF  00
+024A:  DECFSZ 00,F
+024C:  BRA    024A
+024E:  NOP   
+0250:  MOVF   FB4,W
+0252:  BCF    FA1.6
+....................    setup_vref(FALSE); 
+0254:  CLRF   FB5
+....................    setup_oscillator(False); 
+0256:  CLRF   FD3
+0258:  MOVF   FD3,W
+....................   
+....................    printf("%c%c",0xfe,0x01); 
+025A:  MOVLW  FE
+025C:  BTFSS  F9E.4
+025E:  BRA    025C
+0260:  MOVWF  FAD
+0262:  MOVLW  01
+0264:  BTFSS  F9E.4
+0266:  BRA    0264
+0268:  MOVWF  FAD
+....................     
+....................    for(i = 0; i <= 254; ++i) // de 0 à 254 
+026A:  CLRF   08
+026C:  CLRF   07
+026E:  BTFSC  08.7
+0270:  BRA    027C
+0272:  MOVF   08,F
+0274:  BNZ   02BE
+0276:  MOVF   07,W
+0278:  SUBLW  FE
+027A:  BNC   02BE
+....................    {       
+....................       value = i +10; 
+027C:  MOVLW  0A
+027E:  ADDWF  07,W
+0280:  MOVWF  01
+0282:  MOVLW  00
+0284:  ADDWFC 08,W
+0286:  MOVFF  01,05
+....................       write_eeprom(i,value);    
+028A:  MOVFF  07,FA9
+028E:  MOVFF  05,FA8
+0292:  BCF    FA6.6
+0294:  BCF    FA6.7
+0296:  BSF    FA6.2
+0298:  MOVF   FF2,W
+029A:  MOVWF  00
+029C:  BCF    FF2.7
+029E:  MOVLB  F
+02A0:  MOVLW  55
+02A2:  MOVWF  FA7
+02A4:  MOVLW  AA
+02A6:  MOVWF  FA7
+02A8:  BSF    FA6.1
+02AA:  BTFSC  FA6.1
+02AC:  BRA    02AA
+02AE:  BCF    FA6.2
+02B0:  MOVF   00,W
+02B2:  IORWF  FF2,F
+....................    } 
+02B4:  INCF   07,F
+02B6:  BTFSC  FD8.2
+02B8:  INCF   08,F
+02BA:  MOVLB  0
+02BC:  BRA    026E
+....................        
+....................    while (TRUE){    
+....................       for(i = 254; i >= 0; --i)  // de 254 à 0 
+02BE:  CLRF   08
+02C0:  MOVLW  FE
+02C2:  MOVWF  07
+02C4:  BTFSC  08.7
+02C6:  BRA    0366
+02C8:  BRA    02CA
+....................       {      
+....................       valeur = read_eeprom(i); 
+02CA:  MOVFF  FF2,09
+02CE:  BCF    FF2.7
+02D0:  MOVFF  07,FA9
+02D4:  BCF    FA6.6
+02D6:  BCF    FA6.7
+02D8:  BSF    FA6.0
+02DA:  MOVF   FA8,W
+02DC:  BTFSC  09.7
+02DE:  BSF    FF2.7
+02E0:  MOVWF  06
+....................       printf("\f"); 
+02E2:  MOVLW  0C
+02E4:  BTFSS  F9E.4
+02E6:  BRA    02E4
+02E8:  MOVWF  FAD
+....................       printf("%c%c",0xfe,0xc0); 
+02EA:  MOVLW  FE
+02EC:  BTFSS  F9E.4
+02EE:  BRA    02EC
+02F0:  MOVWF  FAD
+02F2:  MOVLW  C0
+02F4:  BTFSS  F9E.4
+02F6:  BRA    02F4
+02F8:  MOVWF  FAD
+....................       printf("A l'adresse %3Ld la",i); 
+02FA:  MOVLW  04
+02FC:  MOVWF  FF6
+02FE:  MOVLW  00
+0300:  MOVWF  FF7
+0302:  MOVLW  0C
+0304:  MOVWF  09
+0306:  RCALL  0040
+0308:  MOVLW  03
+030A:  MOVWF  FE9
+030C:  MOVFF  08,0A
+0310:  MOVFF  07,09
+0314:  BRA    0060
+0316:  MOVLW  20
+0318:  BTFSS  F9E.4
+031A:  BRA    0318
+031C:  MOVWF  FAD
+031E:  MOVLW  6C
+0320:  BTFSS  F9E.4
+0322:  BRA    0320
+0324:  MOVWF  FAD
+0326:  MOVLW  61
+0328:  BTFSS  F9E.4
+032A:  BRA    0328
+032C:  MOVWF  FAD
+....................       printf("%c%c",0xfe,0x94); 
+032E:  MOVLW  FE
+0330:  BTFSS  F9E.4
+0332:  BRA    0330
+0334:  MOVWF  FAD
+0336:  MOVLW  94
+0338:  BTFSS  F9E.4
+033A:  BRA    0338
+033C:  MOVWF  FAD
+....................       printf("valeur a 10 de plus\n\r c'est a dire %3u",valeur); 
+033E:  MOVLW  18
+0340:  MOVWF  FF6
+0342:  MOVLW  00
+0344:  MOVWF  FF7
+0346:  MOVLW  23
+0348:  MOVWF  09
+034A:  RCALL  0040
+034C:  MOVFF  06,09
+0350:  MOVLW  13
+0352:  MOVWF  0A
+0354:  BRA    0166
+....................       delay_ms(250); 
+0356:  MOVLW  FA
+0358:  MOVWF  0A
+035A:  RCALL  01D4
+....................       } 
+035C:  MOVF   07,W
+035E:  BTFSC  FD8.2
+0360:  DECF   08,F
+0362:  DECF   07,F
+0364:  BRA    02C4
+....................    delay_ms(1000);    
+0366:  MOVLW  04
+0368:  MOVWF  09
+036A:  MOVLW  FA
+036C:  MOVWF  0A
+036E:  RCALL  01D4
+0370:  DECFSZ 09,F
+0372:  BRA    036A
+....................    } 
+0374:  BRA    02BE
+.................... }  
+0376:  SLEEP 
+
+Configuration Fuses:
+   Word  1: CC3F   IESO FCMEN HS PLL12 CPUDIV4 USBDIV
+   Word  2: 0E3F   BROWNOUT WDT128 NOWDT BORV20 NOPUT VREGEN
+   Word  3: 8700   PBADEN CCP2C1 MCLR LPT1OSC
+   Word  4: 00A5   STVREN NODEBUG LVP NOXINST ICPRT
+   Word  5: C00F   NOPROTECT NOCPD NOCPB
+   Word  6: E00F   NOWRT NOWRTD NOWRTC NOWRTB
+   Word  7: 400F   NOEBTR NOEBTRB

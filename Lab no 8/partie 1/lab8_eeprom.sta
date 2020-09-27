@@ -1,0 +1,50 @@
+
+ROM used: 888 (3%)
+          888 (3%) including unused fragments
+
+          2 Average locations per line
+          32 Average locations per statement
+
+RAM used: 9 (0%) at main() level
+          17 (1%) worst case
+
+Stack used: 2 worst case (out of 31 total available)
+
+Lines Stmts  %   Files
+----- ----- ---  -----
+   84    28 100  lab8_eeprom.c
+   38     0   0  lab8_eeprom.h
+  451     0   0  C:\Program Files\PICC\devices\18F4550.h
+----- -----
+  573    28 Total
+
+Page ROM  %  RAM   Vol Diff  Functions:
+---- --- --- ---   --- ----  ----------
+0     38   2   1             @delay_ms1
+0    382  22   5  1022  6.3  main
+0     20   1   0             @const78
+0     32   2   3             @PSTRINGCN_9600_31766_31767
+0    222  12   9             @PRINTF_LD_9600_31766_31767
+0     40   2   0             @const84
+0     40   2   3             @DIV88
+0    110   6   2             @PRINTF_U_9600_31766_31767
+
+Program metrics:
+    Functions               1
+    Statements              28
+    Comments                228
+    Volume (V)              1039
+    Difficilty (D)          5.7
+    Effort to implement (E) 5956
+    Time to implement (T)   6 minutes
+    Est Delivered Bugs (B)  0
+    Cyclomatic Complexity   2
+    Maintainability (MI)    31
+
+ Segment     Used  Free
+-----------  ----  ----
+00000-00002     4  0  
+00004-07FFE   884  31880  
+
+
+
