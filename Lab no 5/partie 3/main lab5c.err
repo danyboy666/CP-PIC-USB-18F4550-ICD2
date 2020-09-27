@@ -1,0 +1,3 @@
+>>> Warning 225 "main lab5c.c" Line 45(23,56): Duplicate #define
+      Memory usage:   ROM=4%      RAM=1% - 1%
+      0 Errors,  1 Warnings.

@@ -1,0 +1,131 @@
+000     @SCRATCH
+001     @SCRATCH
+001     _RETURN_
+002     @SCRATCH
+003     @SCRATCH
+005     MAIN.c
+006-00F MAIN.weekday
+010-016 MAIN.dt
+017     @PRINTF_U_9600_31766_31767.P1
+017-018 PCF8583_set_datetime.dt
+017-018 PCF8583_read_datetime.dt
+017     MAIN.@SCRATCH1
+017     @PSTRINGC_9600_31766_31767.@SCRATCH1
+017     @PSTRINGR_9600_31766_31767.@SCRATCH1
+018     @PRINTF_U_9600_31766_31767.P1
+018     @delay_ms1.P2
+018     MAIN.@SCRATCH2
+018     @PSTRINGC_9600_31766_31767.@SCRATCH2
+018     @PSTRINGR_9600_31766_31767.@SCRATCH2
+019     PCF8583_set_datetime.bcd_sec
+019     @DIV88.P1
+019     PCF8583_read_datetime.year_bits
+019     MAIN.@SCRATCH3
+01A     PCF8583_set_datetime.bcd_min
+01A     @DIV88.P1
+01A     PCF8583_read_datetime.year
+01B     PCF8583_read_datetime.bcd_sec
+01B     PCF8583_set_datetime.bcd_hrs
+01B     @DIV88.@SCRATCH1
+01C     PCF8583_read_datetime.bcd_min
+01C     PCF8583_set_datetime.bcd_day
+01D     PCF8583_read_datetime.bcd_hrs
+01D     PCF8583_set_datetime.bcd_mon
+01E     PCF8583_read_datetime.bcd_day
+01E     PCF8583_set_datetime.@SCRATCH1
+01F     PCF8583_read_datetime.bcd_mon
+01F     bin2bcd.value
+01F     PCF8583_set_datetime.@SCRATCH2
+020     bin2bcd.retval
+020     PCF8583_read_byte.address
+020     PCF8583_write_byte.address
+020     PCF8583_read_datetime.@SCRATCH1
+021     PCF8583_read_byte.retval
+021     PCF8583_write_byte.data
+021     PCF8583_read_datetime.@SCRATCH2
+022     @I2C_WRITE_1.P1
+022     @I2C_READ_1.P2
+022     PCF8583_read_datetime.@SCRATCH3
+023     bcd2bin.bcd_value
+023     @I2C_READ_1.@SCRATCH1
+024     bcd2bin.temp
+024     @I2C_READ_1.@SCRATCH2
+025     bcd2bin.@SCRATCH1
+F83     PSP_DATA
+FB4.6   C1OUT
+FB4.7   C2OUT
+FBB     CCP_2
+FBB     CCP_2_LOW
+FBC     CCP_2_HIGH
+FBE     CCP_1
+FBE     CCP_1_LOW
+FBF     CCP_1_HIGH
+FE1-FE2 @READ_PACKED_MEMORY.P1
+FE1-FE2 @WRITE_PACKED_MEMORY.P2
+FE9-FEA @WRITE_PACKED_MEMORY.P1
+FE9-FEA @WRITE_PROGRAM_MEMORY.P2
+FE9-FEA @READ_PACKED_MEMORY.P3
+FE9-FEA @READ_PROGRAM_MEMORY.P4
+FF6-FF8 @READ_PROGRAM_MEMORY.P1
+FF6-FF8 @WRITE_PROGRAM_MEMORY.P2
+
+ROM Allocation:
+036C  @delay_ms1
+0394  @I2C_READ_1
+00F6  @I2C_WRITE_1
+0004  weekday_names
+0162  PCF8583_write_byte
+0420  PCF8583_read_byte
+01C6  PCF8583_init
+01F2  bin2bcd
+03FA  bcd2bin
+0212  PCF8583_set_datetime
+04BA  PCF8583_read_datetime
+0748  MAIN
+0030  @const120
+01D0  @PSTRINGC_9600_31766_31767
+005E  @const122
+0092  @const124
+00B6  @const125
+00D4  @const127
+068C  @PSTRINGR_9600_31766_31767
+06B4  @DIV88
+06DC  @PRINTF_U_9600_31766_31767
+0748  @cinit
+
+
+User Memory space: 
+
+User Memory space: 
+
+Project Directory:
+    F:\Electro\Programmation\Programmations_PIC_C\243-444-RK\Lab no 5\partie 4\
+
+Project Files:
+    EX_RTC.c
+    C:\Program Files\PICC\drivers\ctype.h
+    EX_RTC.h
+    C:\Program Files\PICC\devices\18F4550.h
+    PCF8583.c
+
+Units:
+    F:\Electro\Programmation\Programmations_PIC_C\243-444-RK\Lab no 5\partie 4\EX_RTC (main)
+
+Compiler Settings:
+    Processor:      PIC18F4550
+    Pointer Size:   16
+    ADC Range:      0-255
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+
+Output Files:
+    Errors:      EX_RTC.err
+    Ext Symbols: EX_RTC.esym
+    INHX32:      EX_RTC.hex
+    Symbols:     EX_RTC.sym
+    List:        EX_RTC.lst
+    Debug/COFF:  EX_RTC.cof
+    Project:     EX_RTC.PJT
+    Call Tree:   EX_RTC.tre
+    Statistics:  EX_RTC.sta

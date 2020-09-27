@@ -1,0 +1,118 @@
+000     @SCRATCH
+001     @SCRATCH
+001     _RETURN_
+002     @SCRATCH
+003     @SCRATCH
+004-005 strtok.save
+006     MAIN.sec
+007     MAIN.min
+008     MAIN.hour
+009     MAIN.day
+00A     MAIN.date
+00B     MAIN.month
+00C     MAIN.year
+00D     MAIN.ampm_test
+00E.0   MAIN.ampm
+00E.1   MAIN.mode_12hr
+00F     @PRINTF_X_9600_31766_31767.P1
+00F     write_DS1307.address
+00F     LCD_Position.line
+00F     @PSTRINGCN_9600_31766_31767.P1
+00F     read_DS1307.address
+00F     MAIN.@SCRATCH1
+00F     @PSTRINGC_9600_31766_31767.@SCRATCH1
+010     read_DS1307.data
+010     LCD_Position.column
+010     write_DS1307.data
+010     @PRINTF_X_9600_31766_31767.P1
+010     @delay_ms1.P2
+010     @PSTRINGCN_9600_31766_31767.@SCRATCH1
+010     @PSTRINGC_9600_31766_31767.@SCRATCH2
+011     LCD_Position.i
+011     @I2C_READU_1.P1
+011.0   write_DS1307.status
+011     @PSTRINGCN_9600_31766_31767.@SCRATCH2
+012     @I2C_WRITEU_1.P1
+012     write_DS1307.@SCRATCH1
+012     LCD_Position.@SCRATCH1
+F83     PSP_DATA
+FB4.6   C1OUT
+FB4.7   C2OUT
+FBB     CCP_2
+FBB     CCP_2_LOW
+FBC     CCP_2_HIGH
+FBE     CCP_1_LOW
+FBE     CCP_1
+FBF     CCP_1_HIGH
+FE1-FE2 @WRITE_PACKED_MEMORY.P1
+FE1-FE2 @READ_PACKED_MEMORY.P2
+FE9-FEA @READ_PROGRAM_MEMORY.P1
+FE9-FEA @WRITE_PROGRAM_MEMORY.P2
+FE9-FEA @READ_PACKED_MEMORY.P3
+FE9-FEA @WRITE_PACKED_MEMORY.P4
+FF6-FF8 @WRITE_PROGRAM_MEMORY.P1
+FF6-FF8 @READ_PROGRAM_MEMORY.P2
+
+ROM Allocation:
+0206  @delay_ms1
+0076  @I2C_WRITEU_1
+00E0  @I2C_READU_1
+006E  ds1307_init
+0092  write_DS1307
+00FE  read_DS1307
+0130  LCD_Position
+022E  MAIN
+0004  @const220
+0180  @PSTRINGCN_9600_31766_31767
+01A2  @PRINTF_X_9600_31766_31767
+001A  @const226
+01E4  @PSTRINGC_9600_31766_31767
+0026  @const228
+0032  @const229
+003E  @const230
+004A  @const231
+0056  @const232
+0062  @const233
+0472  @goto10644
+022E  @cinit
+
+
+User Memory space: 
+
+User Memory space: 
+
+Project Directory:
+    F:\Electro\Programmation\Programmations_PIC_C\243-444-RK\Lab no 5\partie 2\
+
+Project Files:
+    main lab5b.c
+    main lab5b.h
+    C:\Program Files\PICC\devices\18F4550.h
+    DS1307_db666.c
+    SLCD.c
+    C:\Program Files\PICC\drivers\stdio.h
+    C:\Program Files\PICC\drivers\string.h
+    C:\Program Files\PICC\drivers\stddef.h
+    C:\Program Files\PICC\drivers\ctype.h
+
+Units:
+    F:\Electro\Programmation\Programmations_PIC_C\243-444-RK\Lab no 5\partie 2\main lab5b (main)
+
+Compiler Settings:
+    Processor:      PIC18F4550
+    Pointer Size:   16
+    ADC Range:      0-255
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+
+Output Files:
+    Errors:      main lab5b.err
+    Ext Symbols: main lab5b.esym
+    INHX32:      main lab5b.hex
+    Symbols:     main lab5b.sym
+    List:        main lab5b.lst
+    Debug/COFF:  main lab5b.cof
+    Project:     main lab5b.PJT
+    Call Tree:   main lab5b.tre
+    Statistics:  main lab5b.sta

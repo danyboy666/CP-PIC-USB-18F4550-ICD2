@@ -1,0 +1,120 @@
+000     @SCRATCH
+001     @SCRATCH
+001     _RETURN_
+002     @SCRATCH
+003     @SCRATCH
+004-00A rtc_value
+00B-00C strtok.save
+00D     init_I2C_Clock.tmp
+00D     LCD_Position.line
+00D     @PSTRINGCN_9600_31766_31767.P1
+00D     set_I2C_Clock.hour
+00D     @PRINTF_X_9600_31766_31767.P1
+00D     get_I2C_Clock.@SCRATCH1
+00D     MAIN.@SCRATCH1
+00D     @PSTRINGC_9600_31766_31767.@SCRATCH1
+00E     set_I2C_Clock.minut
+00E     LCD_Position.column
+00E     @PRINTF_X_9600_31766_31767.P1
+00E     read_I2C_Clock.rtcreg
+00E     @delay_ms1.P1
+00E     @PSTRINGC_9600_31766_31767.@SCRATCH2
+00E     @PSTRINGCN_9600_31766_31767.@SCRATCH1
+00F     set_I2C_Clock.second
+00F     LCD_Position.i
+00F     read_I2C_Clock.datain
+00F     @PSTRINGCN_9600_31766_31767.@SCRATCH2
+010     set_I2C_Clock.day
+010     @I2C_READU_1.P1
+010     LCD_Position.@SCRATCH1
+011     set_I2C_Clock.month
+012     set_I2C_Clock.year
+013     set_I2C_Clock.weekday
+014     set_I2C_Clock.@SCRATCH1
+015     write_I2C_Clock.rtcreg
+016     write_I2C_Clock.rtc_data
+017     @I2C_WRITEU_1.P1
+F83     PSP_DATA
+FB4.6   C1OUT
+FB4.7   C2OUT
+FBB     CCP_2
+FBB     CCP_2_LOW
+FBC     CCP_2_HIGH
+FBE     CCP_1_LOW
+FBE     CCP_1
+FBF     CCP_1_HIGH
+FE1-FE2 @WRITE_PACKED_MEMORY.P1
+FE1-FE2 @READ_PACKED_MEMORY.P2
+FE9-FEA @READ_PROGRAM_MEMORY.P1
+FE9-FEA @READ_PACKED_MEMORY.P2
+FE9-FEA @WRITE_PACKED_MEMORY.P3
+FE9-FEA @WRITE_PROGRAM_MEMORY.P4
+FF6-FF8 @WRITE_PROGRAM_MEMORY.P1
+FF6-FF8 @READ_PROGRAM_MEMORY.P2
+
+ROM Allocation:
+02C8  @delay_ms1
+007C  @I2C_WRITEU_1
+0098  @I2C_READU_1
+00B6  read_I2C_Clock
+00E8  write_I2C_Clock
+0108  init_I2C_Clock
+019E  get_I2C_Clock
+0134  set_I2C_Clock
+01F2  LCD_Position
+02F0  MAIN
+0004  @const228
+0242  @PSTRINGC_9600_31766_31767
+0016  @const230
+0264  @PSTRINGCN_9600_31766_31767
+0286  @PRINTF_X_9600_31766_31767
+0028  @const236
+0034  @const237
+0040  @const238
+004C  @const239
+0058  @const240
+0064  @const241
+0070  @const242
+0488  @goto10625
+02F0  @cinit
+
+
+User Memory space: 
+
+User Memory space: 
+
+Project Directory:
+    F:\Electro\Programmation\Programmations_PIC_C\243-444-RK\Lab no 5\partie 3\
+
+Project Files:
+    main lab5c.c
+    main lab5c.h
+    C:\Program Files\PICC\devices\18F4550.h
+    RTC_Clock.c
+    SLCD.c
+    C:\Program Files\PICC\drivers\stdio.h
+    C:\Program Files\PICC\drivers\string.h
+    C:\Program Files\PICC\drivers\stddef.h
+    C:\Program Files\PICC\drivers\ctype.h
+
+Units:
+    F:\Electro\Programmation\Programmations_PIC_C\243-444-RK\Lab no 5\partie 3\main lab5c (main)
+
+Compiler Settings:
+    Processor:      PIC18F4550
+    Pointer Size:   16
+    ADC Range:      0-255
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+
+Output Files:
+    Errors:      main lab5c.err
+    Ext Symbols: main lab5c.esym
+    INHX32:      main lab5c.hex
+    Symbols:     main lab5c.sym
+    List:        main lab5c.lst
+    Debug/COFF:  main lab5c.cof
+    Project:     main lab5c.PJT
+    Call Tree:   main lab5c.tre
+    Statistics:  main lab5c.sta

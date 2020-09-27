@@ -1,0 +1,14 @@
+ÀÄlab9_ADC_CON
+   ÀÄmain  0/276  Ram=1
+      ÃÄ??0??
+      ÃÄ@delay_ms1  0/40  Ram=1
+      ÃÄ@ITOF  0/56  Ram=2
+      ÃÄ@MULFF  0/242  Ram=11
+      ÃÄ@PSTRINGC_9600_31766_31767  0/34  Ram=2
+      ÃÄ@PSTRINGC_9600_31766_31767  0/34  Ram=2
+      ÃÄ@PRINTF_L32D_9600_31766_31767FPFPF  0/392  Ram=13
+      ³  ÃÄ@MULFF  0/242  Ram=11
+      ³  ÃÄ@FTOSD  0/64  Ram=5
+      ³  ÃÄ@DIV3232  0/122  Ram=13
+      ³  ÀÄ@DIV3232  0/122  Ram=13
+      ÀÄ@PSTRINGCN_9600_31766_31767  0/34  Ram=3

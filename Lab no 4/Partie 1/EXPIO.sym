@@ -1,0 +1,96 @@
+000     @SCRATCH
+001     @SCRATCH
+001     _RETURN_
+002     @SCRATCH
+003     @SCRATCH
+004-005 strtok.save
+006     MAIN.data
+007     MAIN.pinValue
+008-009 read_expanded_inputs.ei
+008     @PSTRINGCN_9600_31766_31767.P1
+008     @PRINTF_U_9600_31766_31767.P2
+008     LCD_Position.line
+008-009 write_expanded_outputs.eo
+009     @PRINTF_U_9600_31766_31767.P1
+009     LCD_Position.column
+009     @PSTRINGCN_9600_31766_31767.@SCRATCH1
+00A     read_expanded_inputs.i
+00A     write_expanded_outputs.i
+00A     @DIV88.P1
+00A     LCD_Position.i
+00A     @PSTRINGCN_9600_31766_31767.@SCRATCH2
+00B     @DIV88.P1
+00B     LCD_Position.@SCRATCH1
+00B     write_expanded_outputs.@SCRATCH1
+00C     @DIV88.@SCRATCH1
+F83     PSP_DATA
+FB4.6   C1OUT
+FB4.7   C2OUT
+FBB     CCP_2_LOW
+FBB     CCP_2
+FBC     CCP_2_HIGH
+FBE     CCP_1_LOW
+FBE     CCP_1
+FBF     CCP_1_HIGH
+FE1-FE2 @READ_PACKED_MEMORY.P1
+FE1-FE2 @WRITE_PACKED_MEMORY.P2
+FE9-FEA @WRITE_PACKED_MEMORY.P1
+FE9-FEA @READ_PROGRAM_MEMORY.P2
+FE9-FEA @WRITE_PROGRAM_MEMORY.P3
+FE9-FEA @READ_PACKED_MEMORY.P4
+FF6-FF8 @READ_PROGRAM_MEMORY.P1
+FF6-FF8 @WRITE_PROGRAM_MEMORY.P2
+
+ROM Allocation:
+0016  LCD_ClearDisplay
+006A  LCD_Position
+0174  write_expanded_outputs
+002A  read_expanded_inputs
+01C6  MAIN
+0004  @const203
+00BC  @PSTRINGCN_9600_31766_31767
+00DE  @DIV88
+0106  @PRINTF_U_9600_31766_31767
+01C6  @cinit
+
+
+User Memory space: 
+
+User Memory space: 
+
+Project Directory:
+    E:\Electro\Programmation\Programmations_PIC_C\243-444-RK\Lab no 4\Partie 1\
+
+Project Files:
+    EXPIO.c
+    EXPIO.h
+    C:\Program Files\PICC\devices\18F4550.h
+    SLCD.c
+    C:\Program Files\PICC\drivers\stdio.h
+    C:\Program Files\PICC\drivers\string.h
+    C:\Program Files\PICC\drivers\stddef.h
+    C:\Program Files\PICC\drivers\ctype.h
+    C:\Program Files\PICC\drivers\74595.c
+    C:\Program Files\PICC\drivers\74165.c
+
+Units:
+    E:\Electro\Programmation\Programmations_PIC_C\243-444-RK\Lab no 4\Partie 1\EXPIO (main)
+
+Compiler Settings:
+    Processor:      PIC18F4550
+    Pointer Size:   16
+    ADC Range:      0-255
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+
+Output Files:
+    Errors:      EXPIO.err
+    Ext Symbols: EXPIO.esym
+    INHX32:      EXPIO.hex
+    Symbols:     EXPIO.sym
+    List:        EXPIO.lst
+    Debug/COFF:  EXPIO.cof
+    Project:     EXPIO.PJT
+    Call Tree:   EXPIO.tre
+    Statistics:  EXPIO.sta

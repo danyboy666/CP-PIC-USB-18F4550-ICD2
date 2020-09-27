@@ -1,0 +1,1585 @@
+CCS PCH C Compiler, Version 4.104, 5967               21-mars-12 02:48
+
+               Filename: F:\Electro\Programmation\Programmations_PIC_C\243-444-RK\Lab no 5\partie 5\RTC_DB666.lst
+
+               ROM used: 1376 bytes (4%)
+                         Largest free fragment is 31392
+               RAM used: 17 (1%) at main() level
+                         28 (1%) worst case
+               Stack:    3 locations
+
+*
+0000:  GOTO   0326
+.................... ///////////////////////////////////////////////////////////////////////////////// 
+.................... //                 Applications des microcontrolleurs               243-444-RK // 
+.................... //                         Laboratoire no. 5 (partie 3)                        // 
+.................... //         Programme no 1: Expérimentation avec le protocole I²C               // 
+.................... //                 Modules utilisé:  ET-MINI PCF8583                           //  
+.................... //  Ce Programme Peut lire le module et obtenir la date et l'heure dans le     // 
+.................... //  format 12 heures ou 24 heures en speciant dans le programme principale     // 
+.................... //                    // Mode 12 heures -> mode_12hr = ENABLED                 // 
+.................... //                    // Mode 24 heures -> mode_12hr = DISABLED                // 
+.................... ///////////////////////////////////////////////////////////////////////////////// 
+.................... //                                                                             // 
+.................... // (c)Copyright 2012 : Dany Ferron 2012                                        // 
+.................... //                                                                             // 
+.................... ///////////////////////////////////////////////////////////////////////////////// 
+.................... //                                                                             // 
+.................... //                                                                             // 
+.................... //              _________________                                              // 
+.................... //            -|1              40|-RB7                                         // 
+.................... //            -|                 |-RB6                                         // 
+.................... //            -|    PIC18F4550   |-RB5                                         // 
+.................... //            -|      @20MHz     |-RB4                                         // 
+.................... //            -|                 |-RB3                                         // 
+.................... //            -|                 |-RB2                                         // 
+.................... //            -|                 |-RB1 <-> SLC (serial clock)                  // 
+.................... //            -|                 |-RB0 <-> SDA (serial data)                   // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-RC7/RX <- This is the connection to the     // 
+.................... //            -|                 |-RC6/TX -> MELabs serial LCD controller      // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //         RD0-|                 |-                                            // 
+.................... //         RD1-|20             21|-RD2                                         // 
+.................... //              -----------------                                              // 
+.................... //                                                                             // 
+.................... ///////////////////////////////////////////////////////////////////////////////// 
+....................  
+.................... #include "RTC_DB666.h" 
+.................... #include <18F4550.h> 
+.................... //////// Standard Header file for the PIC18F4550 device //////////////// 
+.................... #device PIC18F4550 
+.................... #list 
+....................  
+.................... #device adc=8 
+....................  
+.................... #FUSES NOWDT                    //No Watch Dog Timer 
+.................... #FUSES WDT128                   //Watch Dog Timer uses 1:128 Postscale 
+.................... #FUSES HS                       //High speed Osc (> 4mhz) 
+.................... #FUSES NOPROTECT                //Code not protected from reading 
+.................... #FUSES BROWNOUT                 //Reset when brownout detected 
+.................... #FUSES BORV20                   //Brownout reset at 2.0V 
+.................... #FUSES NOPUT                    //No Power Up Timer 
+.................... #FUSES NOCPD                    //No EE protection 
+.................... #FUSES STVREN                   //Stack full/underflow will cause reset 
+.................... #FUSES NODEBUG                  //No Debug mode for ICD 
+.................... #FUSES LVP                      //Low Voltage Programming on B3(PIC16) or B5(PIC18) 
+.................... #FUSES NOWRT                    //Program memory not write protected 
+.................... #FUSES NOWRTD                   //Data EEPROM not write protected 
+.................... #FUSES IESO                     //Internal External Switch Over mode enabled 
+.................... #FUSES FCMEN                    //Fail-safe clock monitor enabled 
+.................... #FUSES PBADEN                   //PORTB pins are configured as analog input channels on RESET 
+.................... #FUSES NOWRTC                   //configuration not registers write protected 
+.................... #FUSES NOWRTB                   //Boot block not write protected 
+.................... #FUSES NOEBTR                   //Memory not protected from table reads 
+.................... #FUSES NOEBTRB                  //Boot block not protected from table reads 
+.................... #FUSES NOCPB                    //No Boot Block code protection 
+.................... #FUSES MCLR                     //Master Clear pin enabled 
+.................... #FUSES LPT1OSC                  //Timer1 configured for low-power operation 
+.................... #FUSES NOXINST                  //Extended set extension and Indexed Addressing mode disabled (Legacy mode) 
+.................... #FUSES PLL12                    //Divide By 12(48MHz oscillator input) 
+.................... #FUSES CPUDIV4                  //System Clock by 4 
+.................... #FUSES USBDIV                   //USB clock source comes from PLL divide by 2 
+.................... #FUSES VREGEN                   //USB voltage regulator enabled 
+.................... #FUSES ICPRT                    //ICPRT enabled 
+....................  
+.................... #use delay(clock=20000000) 
+*
+02FE:  CLRF   FEA
+0300:  MOVLW  11
+0302:  MOVWF  FE9
+0304:  MOVF   FEF,W
+0306:  BZ    0322
+0308:  MOVLW  06
+030A:  MOVWF  01
+030C:  CLRF   00
+030E:  DECFSZ 00,F
+0310:  BRA    030E
+0312:  DECFSZ 01,F
+0314:  BRA    030C
+0316:  MOVLW  7B
+0318:  MOVWF  00
+031A:  DECFSZ 00,F
+031C:  BRA    031A
+031E:  DECFSZ FEF,F
+0320:  BRA    0308
+0322:  GOTO   0530 (RETURN)
+.................... #use rs232(baud=9600,parity=N,xmit=PIN_C6,rcv=PIN_C7,bits=8) 
+.................... #use i2c(Master,Fast,sda=PIN_B0,scl=PIN_B1,force_hw) 
+*
+007C:  BCF    FC6.7
+007E:  BCF    F9E.3
+0080:  MOVFF  1B,FC9
+0084:  MOVLW  02
+0086:  BTFSC  FC6.7
+0088:  BRA    0094
+008A:  BTFSS  F9E.3
+008C:  BRA    008A
+008E:  MOVLW  00
+0090:  BTFSC  FC5.6
+0092:  MOVLW  01
+0094:  MOVWF  01
+0096:  RETLW  00
+*
+00D8:  BCF    FC6.6
+00DA:  BSF    FC5.3
+00DC:  BTFSC  FC5.3
+00DE:  BRA    00DC
+00E0:  BTFSC  00.0
+00E2:  BCF    FC5.5
+00E4:  BTFSS  00.0
+00E6:  BSF    FC5.5
+00E8:  BSF    FC5.4
+00EA:  BTFSC  FC5.4
+00EC:  BRA    00EA
+00EE:  MOVFF  FC9,01
+00F2:  GOTO   0118 (RETURN)
+....................  
+.................... #include "PCF8583_DB666.c" 
+.................... ////////////////////////////////////////////////////////////////////////////////  
+.................... ///                            DSPCF8583.C                                   ///  
+.................... ///                     Driver for Real Time Clock                           ///  
+.................... ///                                                                          ///  
+.................... /// PCF8583_init() - Enable oscillator without clearing the seconds register ///  
+.................... ///                 used when PIC loses power and PCF8583 run from 3V BAT    ///  
+.................... ///                  (Must be called at the start of the program)            /// 
+.................... /// PCF8583_set_datetime() - Writes adress and data to the PCF8583           /// 
+.................... /// PCF8583_read_datetime  - Reads the data from adress location             /// 
+.................... ///                                                                          /// 
+.................... ////////////////////////////////////////////////////////////////////////////////  
+.................... ///                                                                          /// 
+.................... /// (c) Copyright 2012 Dany Ferron                                           /// 
+.................... ///                                                                          /// 
+.................... //////////////////////////////////////////////////////////////////////////////// 
+....................  
+....................  
+.................... // TODO: Alarm register  
+....................  
+.................... /*       Registre de controle/status     
+....................  
+....................                   memory location 00 
+....................                   reset state: 0000 0000 
+....................             LSB        
+....................       Bit    0    timer flag (50% duty factor 
+....................                   seconds flag if alarm 
+....................                   enable bit is 0) 
+....................                    
+....................       Bit    1    alarm flag (50% duty factor 
+....................                   minutes flag if alarm 
+....................                   enable bit is 0) 
+....................                    
+....................       Bit    2    alarm enable bit: 
+....................                   0 alarm disabled: flags toggle 
+....................                   alarm control register disabled 
+....................                   (memory locations 08 to 0F 
+....................                   are free RAM space) 
+....................                   1 enable alarm control register 
+....................                   (memory location 08 is the 
+....................                   alarm control register) 
+....................                    
+....................       Bit    3    mask flag: 
+....................                   0 read locations 05 to 06 
+....................                   unmasked 
+....................                   1 read date and month count 
+....................                   directly 
+....................                    
+....................       Bit   4-5   function mode : 
+....................                   00 clock mode 32.768 kHz 
+....................                   01 clock mode 50 Hz 
+....................                   10 event-counter mode 
+....................                   11 test modes 
+....................                    
+....................       Bit    6    hold last count flag : 
+....................                   0 count 
+....................                   1 store and hold last count in 
+....................                   capture latches 
+....................                    
+....................       Bit    7    stop counting flag : 
+....................                   0 count pulses 
+....................                   1 stop counting, reset divider 
+....................             MSB 
+....................              
+....................  
+....................          Format du compteur des heures  
+....................           
+....................                   memory location 04 (hours counter) 
+....................                   reset state: 0000 0000 
+....................             LSB       
+....................       Bit   0-3   unit hours BCD 
+....................              
+....................       Bit   4-5   ten hours (0 to 2 binary) 
+....................                    
+....................       Bit    6    AM/PM flag: 
+....................                   0 AM 
+....................                   1 PM 
+....................                    
+....................       Bit    7    format: 
+....................                   0 24 h format, AM/PM flag 
+....................                   remains unchanged 
+....................                   1 12 h format, AM/PM flag 
+....................                   will be updated 
+....................             MSB 
+.................... */ 
+.................... #ifndef PCF8583_WRITE_ADDRESS 
+.................... //#define PCF8583_WRITE_ADDRESS 0xA0 
+.................... #define PCF8583_WRITE_ADDRESS 0xA2 
+.................... //#define PCF8583_READ_ADDRESS 0xA1 
+.................... #define PCF8583_READ_ADDRESS 0xA3 
+.................... #endif 
+.................... // Register addresses 
+.................... #define PCF8583_CTRL_STATUS_REG 0x00 
+.................... #define PCF8583_100S_REG 0x01 
+.................... #define PCF8583_SECONDS_REG 0x02 
+.................... #define PCF8583_MINUTES_REG 0x03 
+.................... #define PCF8583_HOURS_REG 0x04 
+.................... #define PCF8583_DATE_REG 0x05 
+.................... #define PCF8583_MONTHS_REG 0x06 
+.................... #define PCF8583_TIMER_REG 0x07 
+.................... #define PCF8583_ALARM_CONTROL_REG 0x08 
+.................... #define PCF8583_ALARM_100S_REG 0x09 
+.................... #define PCF8583_ALARM_SECS_REG 0x0A 
+.................... #define PCF8583_ALARM_MINS_REG 0x0B 
+.................... #define PCF8583_ALARM_HOURS_REG 0x0C 
+.................... #define PCF8583_ALARM_DATE_REG 0x0D 
+.................... #define PCF8583_ALARM_MONTHS_REG 0x0E 
+.................... #define PCF8583_ALARM_TIMER_REG 0x0F 
+.................... // Use the first NVRAM address for the year byte. 
+.................... #define PCF8583_YEAR_REG 0x10 
+.................... // Commands for the Control/Status register. 
+.................... #define PCF8583_START_COUNTING 0x00 
+.................... #define PCF8583_STOP_COUNTING 0x80 
+.................... #define PCF8583_LATCH_COUNTING 0x40  
+....................                         
+....................   struct rtc_var // Functions prototypes 
+....................   {  
+....................    BYTE secs;  
+....................    BYTE mins;  
+....................    BYTE hrs;  
+....................    BYTE days;  
+....................    BYTE mths;  
+....................    BYTE yrs;  
+....................    BYTE dows; 
+....................   } 
+....................   rtc_value; 
+....................    
+....................   void config_PCF8583(BYTE cfg) // Write cfg to config register 
+....................   {  
+....................     i2c_start(); 
+*
+0098:  BSF    FC5.0
+009A:  BTFSC  FC5.0
+009C:  BRA    009A
+....................     i2c_write(PCF8583_WRITE_ADDRESS); 
+009E:  MOVLW  A2
+00A0:  MOVWF  1B
+00A2:  RCALL  007C
+....................     i2c_write(PCF8583_CTRL_STATUS_REG); // Pointe vers le registre de controle  
+00A4:  CLRF   1B
+00A6:  RCALL  007C
+....................     i2c_write(cfg); 
+00A8:  MOVFF  11,1B
+00AC:  RCALL  007C
+....................     i2c_stop(); 
+00AE:  BSF    FC5.2
+00B0:  BTFSC  FC5.2
+00B2:  BRA    00B0
+....................   } 
+00B4:  GOTO   012C (RETURN)
+....................  
+....................   BYTE read_PCF8583(BYTE rtcreg) // rtc read subroutine 
+....................   {  
+....................     BYTE data_in; 
+....................      
+....................     i2c_start(); 
+*
+00F6:  BSF    FC5.0
+00F8:  BTFSC  FC5.0
+00FA:  BRA    00F8
+....................     i2c_write(PCF8583_WRITE_ADDRESS); // Device address 
+00FC:  MOVLW  A2
+00FE:  MOVWF  1B
+0100:  RCALL  007C
+....................     i2c_write(rtcreg); // Send address of register to read 
+0102:  MOVFF  11,1B
+0106:  RCALL  007C
+....................     i2c_start(); // Restart 
+0108:  BSF    FC5.1
+010A:  BTFSC  FC5.1
+010C:  BRA    010A
+....................     i2c_write(PCF8583_READ_ADDRESS); 
+010E:  MOVLW  A3
+0110:  MOVWF  1B
+0112:  RCALL  007C
+....................     data_in=i2c_read(0); // Now read from slave 
+0114:  CLRF   00
+0116:  BRA    00D8
+0118:  MOVFF  01,12
+....................     i2c_stop(); 
+011C:  BSF    FC5.2
+011E:  BTFSC  FC5.2
+0120:  BRA    011E
+....................     return(data_in); 
+0122:  MOVFF  12,01
+....................   } 
+0126:  RETLW  00
+....................  
+....................   void write_PCF8583(BYTE rtcreg, BYTE rtc_data) // Writes rtc_data at address rtcreg 
+....................   {  
+....................     i2c_start(); 
+*
+00B8:  BSF    FC5.0
+00BA:  BTFSC  FC5.0
+00BC:  BRA    00BA
+....................     i2c_write(PCF8583_WRITE_ADDRESS); // Device address 
+00BE:  MOVLW  A2
+00C0:  MOVWF  1B
+00C2:  RCALL  007C
+....................     i2c_write(rtcreg); 
+00C4:  MOVFF  19,1B
+00C8:  RCALL  007C
+....................     i2c_write(rtc_data); 
+00CA:  MOVFF  1A,1B
+00CE:  RCALL  007C
+....................     i2c_stop(); 
+00D0:  BSF    FC5.2
+00D2:  BTFSC  FC5.2
+00D4:  BRA    00D2
+....................   } 
+00D6:  RETLW  00
+....................  
+....................   void init_PCF8583()  
+....................   { 
+....................      
+....................       config_PCF8583(PCF8583_CTRL_STATUS_REG); // Setup config 
+*
+0128:  CLRF   11
+012A:  BRA    0098
+....................        
+....................       BYTE tmp; 
+....................    //   config_PCF8583(0x90); // Setup config, with 1Hz output on int 
+....................       bit_clear(tmp,6); 
+012C:  BCF    10.6
+....................       write_PCF8583(0x02, tmp); 
+012E:  MOVLW  02
+0130:  MOVWF  19
+0132:  MOVFF  10,1A
+0136:  RCALL  00B8
+....................       tmp = read_PCF8583(0x00); // Make sure oscillator is running (bit 7 reg0 = 0) 
+0138:  CLRF   11
+013A:  RCALL  00F6
+013C:  MOVFF  01,10
+....................       bit_clear(tmp,7); 
+0140:  BCF    10.7
+....................       write_PCF8583(0x00, tmp);     
+0142:  CLRF   19
+0144:  MOVFF  10,1A
+0148:  RCALL  00B8
+....................   } 
+014A:  GOTO   0362 (RETURN)
+....................  
+....................   void get_PCF8583() // Lecture des données de temps. 
+....................   {        
+....................       BYTE tmp; 
+....................       // Traitement de l'heure. 
+....................       rtc_value.secs=read_PCF8583(PCF8583_SECONDS_REG) & 0x7f; 
+*
+01BE:  MOVLW  02
+01C0:  MOVWF  11
+01C2:  RCALL  00F6
+01C4:  MOVF   01,W
+01C6:  ANDLW  7F
+01C8:  MOVWF  04
+....................       rtc_value.mins=read_PCF8583(PCF8583_MINUTES_REG) & 0x7f; 
+01CA:  MOVLW  03
+01CC:  MOVWF  11
+01CE:  RCALL  00F6
+01D0:  MOVF   01,W
+01D2:  ANDLW  7F
+01D4:  MOVWF  05
+....................       rtc_value.hrs=read_PCF8583(PCF8583_HOURS_REG) & 0x7f; 
+01D6:  MOVLW  04
+01D8:  MOVWF  11
+01DA:  RCALL  00F6
+01DC:  MOVF   01,W
+01DE:  ANDLW  7F
+01E0:  MOVWF  06
+....................       // Traitement de la date. 
+....................       tmp=read_PCF8583(PCF8583_DATE_REG); // Jour 
+01E2:  MOVLW  05
+01E4:  MOVWF  11
+01E6:  RCALL  00F6
+01E8:  MOVFF  01,10
+....................       rtc_value.days = tmp & 0x3f; // day is 6 lower bits 
+01EC:  MOVF   10,W
+01EE:  ANDLW  3F
+01F0:  MOVWF  07
+....................       rtc_value.yrs = (tmp & 0xc0) >> 6; // year is 2 upper bits 
+01F2:  MOVF   10,W
+01F4:  ANDLW  C0
+01F6:  MOVWF  00
+01F8:  SWAPF  00,W
+01FA:  MOVWF  09
+01FC:  RRCF   09,F
+01FE:  RRCF   09,F
+0200:  MOVLW  03
+0202:  ANDWF  09,F
+....................       tmp=read_PCF8583(PCF8583_MONTHS_REG); // mois 
+0204:  MOVLW  06
+0206:  MOVWF  11
+0208:  RCALL  00F6
+020A:  MOVFF  01,10
+....................       rtc_value.mths = tmp & 0x1f; // month is 5 lower bits 
+020E:  MOVF   10,W
+0210:  ANDLW  1F
+0212:  MOVWF  08
+....................       rtc_value.dows = (tmp & 0xe0) >> 5; // weekday is 3 upper bits 
+0214:  MOVF   10,W
+0216:  ANDLW  E0
+0218:  MOVWF  00
+021A:  SWAPF  00,W
+021C:  MOVWF  0A
+021E:  RRCF   0A,F
+0220:  MOVLW  07
+0222:  ANDWF  0A,F
+....................   } 
+0224:  GOTO   03A0 (RETURN)
+....................   // Écriture des données de temps. 
+....................   void set_PCF8583(BYTE hr, BYTE min, BYTE sec, BYTE day, BYTE mth, BYTE yr, BYTE dow)  
+....................   {     
+....................       BYTE tmp; 
+....................        
+....................       write_PCF8583(PCF8583_SECONDS_REG, sec & 0x7f); 
+*
+014E:  MOVF   12,W
+0150:  ANDLW  7F
+0152:  MOVWF  18
+0154:  MOVLW  02
+0156:  MOVWF  19
+0158:  MOVFF  18,1A
+015C:  RCALL  00B8
+....................       write_PCF8583(PCF8583_MINUTES_REG, min & 0x7f); 
+015E:  MOVF   11,W
+0160:  ANDLW  7F
+0162:  MOVWF  18
+0164:  MOVLW  03
+0166:  MOVWF  19
+0168:  MOVFF  18,1A
+016C:  RCALL  00B8
+....................       // Le masque & 0x3f est apliqué dans le programme principal pour pouvoir 
+....................       // traiter le Bit 6 du drapeau AM/PM et le Bit 7 pour celui du mode 12hr. 
+....................       // Voir la decription du format du compteur des heures.   
+....................       write_PCF8583(PCF8583_HOURS_REG, hr); 
+016E:  MOVLW  04
+0170:  MOVWF  19
+0172:  MOVFF  10,1A
+0176:  RCALL  00B8
+....................       tmp = day & 0x3f; 
+0178:  MOVF   13,W
+017A:  ANDLW  3F
+017C:  MOVWF  17
+....................       tmp = tmp | ((yr % 4) << 6); // year is 2 upper bits of byte 
+017E:  MOVF   15,W
+0180:  ANDLW  03
+0182:  MOVWF  00
+0184:  SWAPF  00,F
+0186:  RLCF   00,F
+0188:  RLCF   00,F
+018A:  MOVLW  C0
+018C:  ANDWF  00,F
+018E:  MOVF   00,W
+0190:  IORWF  17,F
+....................       write_PCF8583(PCF8583_DATE_REG, tmp); 
+0192:  MOVLW  05
+0194:  MOVWF  19
+0196:  MOVFF  17,1A
+019A:  RCALL  00B8
+....................       tmp = mth & 0x1f; 
+019C:  MOVF   14,W
+019E:  ANDLW  1F
+01A0:  MOVWF  17
+....................       tmp = tmp | (dow << 5); // weekday is 3 upper bits of byte 
+01A2:  SWAPF  16,W
+01A4:  MOVWF  00
+01A6:  RLCF   00,F
+01A8:  MOVLW  E0
+01AA:  ANDWF  00,F
+01AC:  MOVF   00,W
+01AE:  IORWF  17,F
+....................       write_PCF8583(PCF8583_MONTHS_REG, tmp);  
+01B0:  MOVLW  06
+01B2:  MOVWF  19
+01B4:  MOVFF  17,1A
+01B8:  RCALL  00B8
+....................   } 
+01BA:  GOTO   039E (RETURN)
+....................  
+....................  
+....................  
+....................  
+.................... #include "SLCD.c" 
+.................... //////////////////////////////////////////////////////////////////////////////// 
+.................... //                             SLCD.c                                         // 
+.................... //               Simplifies the use of a Serial LCD.                          // 
+.................... //                                                                            // 
+.................... //                                                                            // 
+.................... //                                                                            // 
+.................... // The value in decimal are:                                                  // 
+.................... // Line 1 = 0-19                                                              // 
+.................... // Line 2 = 64-83                                                             // 
+.................... // Line 3 = 20-39                                                             // 
+.................... // Line 4 = 84-103                                                            // 
+.................... //                                                                            // 
+.................... //////////////////////////////////////////////////////////////////////////////// 
+.................... //                                                                            // 
+.................... // Copyright@ Dany Ferron 2012 & Mike Coombes 2007                            // 
+.................... //                                                                            // 
+.................... //////////////////////////////////////////////////////////////////////////////// 
+....................  
+.................... //Values in HEXADECIMAL for LCD Display fonctions. 
+.................... /* 
+.................... #define clear_lcd             0x01 // Clear Display 
+.................... #define return_home           0x02 // Cursor to Home position 
+.................... #define entry_mode            0x06 // Normal entry mode 
+.................... #define entry_mode_rev        0x04 // Normal entry mode  -reverse direction 
+.................... #define entry_mode_scroll     0x07 // - with shift 
+.................... #define entry_mode_scroll_rev 0x05 // reverse direction 
+....................   
+.................... #define system_set_8_bit      0x38 // 8 bit data mode 2 line ( 5x7 font ) 
+.................... #define system_set_4_bit      0x28 // 4 bit data mode 2 line ( 5x7 font ) 
+.................... #define system_set_reset      0x30 // Reset code 
+.................... #define display_on            0x0C // Display ON - 2 line mode 
+.................... #define display_off           0x08 // Display off 
+.................... #define set_dd_line1          0x80 // Line 1 position 1 
+.................... #define set_dd_line2          0xC0 // Line 2 position 1 
+.................... #define set_dd_ram            0x80 // Line 1 position 1 
+.................... #define write_data            0x00 // With RS = 1 
+.................... #define cursor_on             0x0E // Switch Cursor ON 
+.................... #define cursor_off            0x0C // Switch Cursor OFF 
+.................... #define cursor_blink_on       0x0F // Cursor plus blink 
+.................... #define cursor_shift_right    0x14 // Move cursor right 
+.................... #define cursor_shift_left     0x10 // Move cursor left 
+.................... #define display_shift_right   0x1C // Scroll display right 
+.................... #define display_shift_left    0x18 // Scroll display left 
+.................... */ 
+....................  
+....................  
+.................... #include <stdio.h>       // library containing serial communication functions 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... ////        (C) Copyright 1996,2003 Custom Computer Services           //// 
+.................... //// This source code may only be used by licensed users of the CCS C  //// 
+.................... //// compiler.  This source code may only be distributed to other      //// 
+.................... //// licensed users of the CCS C compiler.  No other use, reproduction //// 
+.................... //// or distribution is permitted without written permission.          //// 
+.................... //// Derivative programs created using this software in object code    //// 
+.................... //// form are not restricted in any way.                               //// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+....................  
+.................... #ifndef _STDIO 
+.................... #define _STDIO 
+.................... #include <string.h> 
+.................... //////////////////////////////////////////////////////////////////////////// 
+.................... ////        (C) Copyright 1996,2008 Custom Computer Services            //// 
+.................... //// This source code may only be used by licensed users of the CCS C   //// 
+.................... //// compiler.  This source code may only be distributed to other       //// 
+.................... //// licensed users of the CCS C compiler.  No other use, reproduction  //// 
+.................... //// or distribution is permitted without written permission.           //// 
+.................... //// Derivative programs created using this software in object code     //// 
+.................... //// form are not restricted in any way.                                //// 
+.................... //////////////////////////////////////////////////////////////////////////// 
+....................  
+.................... #ifndef _STRING 
+.................... #define _STRING 
+.................... #include <stddef.h> 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... ////        (C) Copyright 1996,2003 Custom Computer Services           //// 
+.................... //// This source code may only be used by licensed users of the CCS C  //// 
+.................... //// compiler.  This source code may only be distributed to other      //// 
+.................... //// licensed users of the CCS C compiler.  No other use, reproduction //// 
+.................... //// or distribution is permitted without written permission.          //// 
+.................... //// Derivative programs created using this software in object code    //// 
+.................... //// form are not restricted in any way.                               //// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+....................  
+.................... #ifndef _STDDEF 
+....................  
+.................... #define _STDDEF 
+....................  
+.................... #if sizeof(unsigned int8 *)==1 
+.................... #define ptrdiff_t unsigned int8 
+.................... #else 
+.................... #define ptrdiff_t unsigned int16 
+.................... #endif 
+....................  
+.................... #define size_t unsigned int8 
+.................... #define wchar_t char 
+.................... #define NULL 0 
+....................  
+.................... #define offsetof(s,f) (offsetofbit(s,f)/8) 
+....................  
+.................... #endif 
+....................  
+.................... #include <ctype.h> 
+.................... //////////////////////////////////////////////////////////////////////////// 
+.................... ////        (C) Copyright 1996,2003 Custom Computer Services            //// 
+.................... //// This source code may only be used by licensed users of the CCS C   //// 
+.................... //// compiler.  This source code may only be distributed to other       //// 
+.................... //// licensed users of the CCS C compiler.  No other use, reproduction  //// 
+.................... //// or distribution is permitted without written permission.           //// 
+.................... //// Derivative programs created using this software in object code     //// 
+.................... //// form are not restricted in any way.                                //// 
+.................... //////////////////////////////////////////////////////////////////////////// 
+....................  
+.................... #ifndef _CTYPE 
+.................... #define _CTYPE 
+....................  
+.................... #define islower(x)  isamong(x,"abcdefghijklmnopqrstuvwxyz") 
+.................... #define isupper(x)  isamong(x,"ABCDEFGHIJKLMNOPQRSTUVWXYZ") 
+.................... #define isalnum(x)  isamong(x,"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz") 
+.................... #define isalpha(x)  isamong(x,"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz") 
+.................... #define isdigit(x)  isamong(x,"0123456789") 
+.................... #define isspace(x)  ((x)==' ') 
+.................... #define isxdigit(x) isamong(x,"0123456789ABCDEFabcdef") 
+.................... #define iscntrl(x)  ((x)<' ') 
+.................... #define isprint(x)  ((x)>=' ') 
+.................... #define isgraph(x)  ((x)>' ') 
+.................... #define ispunct(x)  (((x)>' ')&&!isalnum(x)) 
+....................  
+.................... #endif 
+....................  
+....................  
+....................  
+....................  
+....................  
+.................... ////////////////////////////////////////////// 
+.................... //// Uncomment the following define to    //// 
+.................... //// allow some functions to use a        //// 
+.................... //// quicker algorithm, but use more ROM  //// 
+.................... ////                                      //// 
+.................... //// #define FASTER_BUT_MORE_ROM          //// 
+.................... ////////////////////////////////////////////// 
+....................  
+....................  
+....................  
+.................... /*Copying functions*/ 
+.................... /* standard template: 
+....................    void *memmove(void *s1, void *s2, size_t n). 
+....................    Copies max of n characters safely (not following ending '\0') 
+....................    from s2 in s1; if s2 has less than n characters, appends 0 */ 
+....................  
+.................... char *memmove(void *s1,char *s2,size_t n) 
+.................... { 
+....................    char *sc1; 
+....................    char *sc2; 
+....................    sc1=s1; 
+....................    sc2=s2; 
+....................    if(sc2<sc1 && sc1 <sc2 +n) 
+....................       for(sc1+=n,sc2+=n;0<n;--n) 
+....................          *--sc1=*--sc2; 
+....................    else 
+....................       for(;0<n;--n) 
+....................          *sc1++=*sc2++; 
+....................   return s1; 
+....................   } 
+....................  
+.................... /* Standard template: char *strcpy(char *s1, const char *s2) 
+....................    copies the string s2 including the null character to s1. 
+....................    This is a compiler built in to handle the different address 
+....................    spaces */ 
+....................  
+.................... #define strcopy strcpy 
+....................  
+.................... /* standard template: 
+....................    char *strncpy(char *s1, const char *s2, size_t n). 
+....................    Copies max of n characters (not following ending '\0') 
+....................    from s2 in s1; if s2 has less than n characters, appends 0 */ 
+....................  
+.................... char *strncpy(char *s1, char *s2, size_t n) 
+.................... { 
+....................   char *s; 
+....................  
+....................   for (s = s1; n > 0 && *s2 != '\0'; n--) 
+....................      *s++ = *s2++; 
+....................   for (; n > 0; n--) 
+....................      *s++ = '\0'; 
+....................  
+....................   return(s1); 
+.................... } 
+.................... /***********************************************************/ 
+....................  
+.................... /*concatenation functions*/ 
+.................... /* standard template: char *strcat(char *s1, const char *s2) 
+.................... appends s2 to s1*/ 
+....................  
+.................... char *strcat(char *s1, char *s2) 
+.................... { 
+....................    char *s; 
+....................  
+....................    for (s = s1; *s != '\0'; ++s); 
+....................    while(*s2 != '\0') 
+....................    { 
+....................       *s = *s2; 
+....................       ++s; 
+....................       ++s2; 
+....................    } 
+....................  
+....................    *s = '\0'; 
+....................    return(s1); 
+.................... } 
+.................... /* standard template: char *strncat(char *s1, char *s2,size_t n) 
+.................... appends not more than n characters from s2 to s1*/ 
+....................  
+.................... char *strncat(char *s1, char *s2, size_t n) 
+.................... { 
+....................    char *s; 
+....................  
+....................    for (s = s1; *s != '\0'; ++s); 
+....................    while(*s2 != '\0' && 0<n) 
+....................    { 
+....................       *s = *s2; 
+....................       ++s; 
+....................       ++s2; 
+....................       --n; 
+....................    } 
+....................  
+....................    *s = '\0'; 
+....................    return(s1); 
+.................... } 
+....................  
+.................... /***********************************************************/ 
+....................  
+....................  
+.................... /*comparison functions*/ 
+.................... /* standard template: signed int memcmp(void *s1, void *s2). 
+....................    Compares s1 & s2; returns -1 if s1<s2, 0 if s1=s2, 1 if s1>s2 */ 
+....................  
+.................... signed int8 memcmp(void * s1,char *s2,size_t n) 
+.................... { 
+.................... char *su1, *su2; 
+.................... for(su1=s1, su2=s2; 0<n; ++su1, ++su2, --n) 
+.................... { 
+....................    if(*su1!=*su2) 
+....................       return ((*su1<*su2)?-1:+1); 
+.................... } 
+.................... return 0; 
+.................... } 
+....................  
+.................... /* standard template: int strcmp(const char *s1, const char *s2). 
+....................    Compares s1 & s2; returns -1 if s1<s2, 0 if s1=s2, 1 if s1>s2 */ 
+....................  
+.................... signed int8 strcmp(char *s1, char *s2) 
+.................... { 
+....................    for (; *s1 == *s2; s1++, s2++) 
+....................       if (*s1 == '\0') 
+....................          return(0); 
+....................    return((*s1 < *s2) ? -1: 1); 
+.................... } 
+.................... /* standard template: int strcoll(const char *s1, const char *s2). 
+....................    Compares s1 & s2; returns -1 if s1<s2, 0 if s1=s2, 1 if s1>s2 */ 
+....................  
+.................... signed int8 strcoll(char *s1, char *s2) 
+.................... { 
+....................    for (; *s1 == *s2; s1++, s2++) 
+....................       if (*s1 == '\0') 
+....................          return(0); 
+....................    return((*s1 < *s2) ? -1: 1); 
+.................... } 
+....................  
+.................... /* standard template: 
+....................    int strncmp(const char *s1, const char *s2, size_t n). 
+....................    Compares max of n characters (not following 0) from s1 to s2; 
+....................    returns same as strcmp */ 
+....................  
+.................... signed int8 strncmp(char *s1, char *s2, size_t n) 
+.................... { 
+....................    for (; n > 0; s1++, s2++, n--) 
+....................       if (*s1 != *s2) 
+....................          return((*s1 <*s2) ? -1: 1); 
+....................       else if (*s1 == '\0') 
+....................          return(0); 
+....................    return(0); 
+.................... } 
+.................... /* standard template: 
+....................    int strxfrm(const char *s1, const char *s2, size_t n). 
+....................    transforms maximum of n characters from s2 and places them into s1*/ 
+.................... size_t strxfrm(char *s1, char *s2, size_t n) 
+.................... { 
+....................   char *s; 
+....................   unsigned int8 n1; 
+....................   n1=n; 
+....................   for (s = s1; n > 0 && *s2 != '\0'; n--) 
+....................      *s++ = *s2++; 
+....................   for (; n > 0; n--) 
+....................      *s++ = '\0'; 
+....................  
+....................   return(n1); 
+.................... } 
+....................  
+....................  
+....................  
+....................  
+....................  
+.................... /***********************************************************/ 
+.................... /*Search functions*/ 
+.................... /* standard template: void *memchr(const char *s, int c). 
+....................    Finds first occurrence of c in n characters of s */ 
+....................  
+.................... char *memchr(void *s,unsigned int8 c,size_t n) 
+.................... { 
+....................    char uc; 
+....................    char *su; 
+....................    uc=c; 
+....................    for(su=s;0<n;++su,--n) 
+....................       if(*su==uc) 
+....................       return su; 
+....................    return NULL; 
+.................... } 
+....................  
+.................... /* standard template: char *strchr(const char *s, int c). 
+....................    Finds first occurrence of c in s */ 
+....................  
+.................... char *strchr(char *s, unsigned int8 c) 
+.................... { 
+....................    for (; *s != c; s++) 
+....................       if (*s == '\0') 
+....................          return(0); 
+....................    return(s); 
+.................... } 
+.................... /* standard template: 
+....................    size_t strcspn(const char *s1, const char *s2). 
+....................    Computes length of max initial segment of s1 that 
+....................    consists entirely of characters NOT from s2*/ 
+....................  
+.................... unsigned int8  strcspn(char *s1, char *s2) 
+.................... { 
+....................    char *sc1, *sc2; 
+....................  
+....................    for (sc1 = s1; *sc1 != 0; sc1++) 
+....................       for (sc2 = s2; *sc2 != 0; sc2++) 
+....................          if (*sc1 == *sc2) 
+....................             return(sc1 - s1); 
+....................    return(sc1 - s1); 
+.................... } 
+.................... /* standard template: 
+....................    char *strpbrk(const char *s1, const char *s2). 
+....................    Locates first occurence of any character from s2 in s1; 
+....................    returns s1 if s2 is empty string */ 
+....................  
+.................... char *strpbrk(char *s1, char *s2) 
+.................... { 
+....................    char *sc1, *sc2; 
+....................  
+....................    for (sc1 = s1; *sc1 != 0; sc1++) 
+....................       for (sc2 = s2; *sc2 != 0; sc2++) 
+....................          if (*sc1 == *sc2) 
+....................             return(sc1); 
+....................    return(0); 
+.................... } 
+....................  
+....................  
+.................... /* standard template: char *strrchr(const char *s, int c). 
+....................    Finds last occurrence of c in s */ 
+....................  
+.................... char *strrchr(char *s, unsigned int8 c) 
+.................... { 
+....................    char *p; 
+....................  
+....................    for (p = 0; ; s++) 
+....................    { 
+....................       if (*s == c) 
+....................          p = s; 
+....................       if (*s == '\0') 
+....................          return(p); 
+....................    } 
+.................... } 
+.................... /* computes length of max initial segment of s1 consisting 
+....................    entirely of characters from s2 */ 
+....................  
+.................... unsigned int8  strspn(char *s1, char *s2) 
+.................... { 
+....................    char *sc1, *sc2; 
+....................  
+....................    for (sc1 = s1; *sc1 != 0; sc1++) 
+....................       for (sc2 = s2; ; sc2++) 
+....................     if (*sc2 == '\0') 
+....................        return(sc1 - s1); 
+....................          else if (*sc1 == *sc2) 
+....................             break; 
+....................    return(sc1 - s1); 
+.................... } 
+.................... /* standard template: 
+....................    char *strstr(const char *s1, const char *s2); 
+....................    Locates first occurence of character sequence s2 in s1; 
+....................    returns 0 if s2 is empty string 
+....................  
+....................    Uncomment #define FASTER_BUT_MORE_ROM at the top of the 
+....................    file to use the faster algorithm */ 
+.................... char *strstr(char *s1, char *s2) 
+.................... { 
+....................    char *s, *t; 
+....................  
+....................    #ifdef FASTER_BUT_MORE_ROM 
+....................    if (*s2 == '\0') 
+....................          return(s1); 
+....................    #endif 
+....................  
+....................    while (*s1) 
+....................    { 
+....................       for(s = s1, t = s2; *t && (*s == *t); ++s, ++t); 
+....................  
+....................       if (*t == '\0') 
+....................          return s1; 
+....................       ++s1; 
+....................       #ifdef FASTER_BUT_MORE_ROM 
+....................          while(*s1 != '\0' && *s1 != *s2) 
+....................             ++s1; 
+....................       #endif 
+....................    } 
+....................    return 0; 
+.................... } 
+....................  
+.................... /* standard template: char *strtok(char *s1, const char *s2). 
+....................  
+....................    Finds next token in s1 delimited by a character from separator 
+....................    string s2 (which can be different from call to call).  First call 
+....................    starts at beginning of s1 searching for first character NOT 
+....................    contained in s2; returns 0 if none is found. 
+....................    If one is found, it is the start of first token (return value). 
+....................    Function then searches from there for a character contained in s2. 
+....................    If none is found, current token extends to end of s1, and subsequent 
+....................    searches for a token will return 0.  If one is found, it is 
+....................    overwritten by '\0', which terminates current token.  Function saves 
+....................    pointer to following character from which next search will start. 
+....................    Each subsequent call, with 0 as first argument, starts searching 
+....................    from saved pointer */ 
+....................  
+.................... char *strtok(char *s1, char *s2) 
+.................... { 
+....................    char *beg, *end; 
+....................    static char *save; 
+....................  
+....................    beg = (s1)? s1: save; 
+....................    beg += strspn(beg, s2); 
+....................    if (*beg == '\0') 
+....................    { 
+....................       *save = ' '; 
+....................       return(0); 
+....................    } 
+....................    end = strpbrk(beg, s2); 
+....................    if (*end != '\0') 
+....................    { 
+....................       *end = '\0'; 
+....................       end++; 
+....................    } 
+....................    save = end; 
+....................    return(beg); 
+.................... } 
+....................  
+.................... /*****************************************************************/ 
+.................... /*Miscellaneous functions*/ 
+.................... /* standard template 
+.................... maps error number in errnum to an error message string 
+.................... Returns: Pointer to string 
+.................... */ 
+.................... #ifdef _ERRNO 
+.................... char * strerror(unsigned int8 errnum) 
+.................... { 
+.................... char s[15]; 
+.................... switch( errnum) 
+.................... { 
+.................... case 0: 
+....................    strcpy(s,"no errors"); 
+....................    return s; 
+.................... case EDOM : 
+....................    strcpy(s,"domain error"); 
+....................    return s; 
+.................... case ERANGE: 
+....................    strcpy(s,"range error"); 
+....................    return s; 
+.................... } 
+.................... } 
+.................... #ENDIF 
+.................... /* standard template: size_t strlen(const char *s). 
+....................    Computes length of s1 (preceding terminating 0) */ 
+....................  
+.................... unsigned int8 strlen(char *s) 
+.................... { 
+....................    char *sc; 
+....................  
+....................    for (sc = s; *sc != 0; sc++); 
+....................    return(sc - s); 
+.................... } 
+....................  
+.................... /* standard template: size_t stricmp(const char *s1, const char *s2). 
+....................    Compares s1 to s2 ignoring case (upper vs. lower) */ 
+....................  
+.................... signed int8 stricmp(char *s1, char *s2) 
+.................... { 
+....................  for(; *s1==*s2||(isalpha(*s1)&&isalpha(*s2)&&(*s1==*s2+32||*s2==*s1+32)); 
+....................     s1++, s2++) 
+....................     if (*s1 == '\0') 
+....................        return(0); 
+....................  return((*s1 < *s2) ? -1: 1); 
+.................... } 
+....................  
+....................  
+.................... /* standard template: char *strlwr(char *s). 
+....................    Replaces uppercase letters by lowercase; 
+....................    returns pointer to new string s */ 
+....................  
+.................... char *strlwr(char *s) 
+.................... { 
+....................    char *p; 
+....................  
+....................    for (p = s; *p != '\0'; p++) 
+....................       if (*p >= 'A' && *p <='Z') 
+....................          *p += 'a' - 'A'; 
+....................    return(s); 
+.................... } 
+....................  
+....................  
+.................... /************************************************************/ 
+....................  
+....................  
+.................... #endif 
+....................  
+.................... #ifndef getc 
+.................... #define getc getch 
+.................... #define getchar getch 
+.................... #define puts(s) {printf(s); putchar(13); putchar(10);} 
+.................... #define putc putchar 
+.................... #endif 
+.................... /* maps error number to an error message. Writes a sequence of characters to 
+.................... stderr stream thus: if s is not null then string pointed to by s follwed by 
+.................... a colon (:) and a space and the appropriate error message returned by strerror 
+.................... function with argument errno 
+....................  
+.................... Returns: no value 
+.................... */ 
+....................  
+.................... #ifdef _ERRNO 
+.................... void perror(char *s) 
+.................... { 
+....................   if(s) 
+....................   fprintf(STDERR,"%s: ",s); 
+....................   fprintf(STDERR,"%s\r\n",strerror(errno)); 
+.................... } 
+.................... #endif 
+.................... #endif 
+....................  
+....................  
+.................... void LCD_ClearDisplay(void) 
+.................... { 
+....................   printf("%c%c",0xFE,0x01); 
+.................... } 
+....................            
+.................... void LCD_CursorOn(void) 
+.................... { 
+....................   printf("%c%c",0xFE,0x0E); 
+.................... } 
+....................  
+.................... void LCD_CursorOff(void) 
+.................... { 
+....................   printf("%c%c",0xFE,0x0C); 
+.................... } 
+....................  
+.................... void LCD_DisplayOn(void) 
+.................... { 
+....................   printf("%c%c",0xFE,0x0C); 
+.................... } 
+....................  
+.................... void LCD_DisplayOff(void) 
+.................... { 
+....................   printf("%c%c",0xFE,0x08); 
+.................... } 
+....................  
+.................... void LCD_BlinkOn(void) 
+.................... { 
+....................   printf("%c%c",0xFE,0x0D); 
+.................... } 
+....................  
+.................... void LCD_BlinkOff(void) 
+.................... { 
+....................   printf("%c%c",0xFE,0x0C); 
+.................... } 
+....................  
+.................... void LCD_UnderlineOn(void) 
+.................... { 
+....................   printf("%c%c",0xFE,0x0E); 
+.................... } 
+....................  
+.................... void LCD_UnderlineOff(void) 
+.................... { 
+....................   printf("%c%c",0xFE,0x0C); 
+.................... } 
+....................  
+.................... void LCD_MoveRight(void) 
+.................... { 
+....................   printf("%c%c",0xFE,0x14); 
+.................... } 
+....................  
+.................... void LCD_MoveLeft(void) 
+.................... { 
+....................   printf("%c%c",0xFE,0x10); 
+.................... } 
+....................  
+.................... void LCD_ScrollRight(void) 
+.................... { 
+....................   printf("%c%c",0xFE,0x1C); 
+.................... } 
+....................  
+.................... void LCD_ScrollLeft(void) 
+.................... { 
+....................   printf("%c%c",0xFE,0x18); 
+.................... } 
+....................  
+.................... /////////////////////////////////////////////////////////////////////////////// 
+.................... //                                                                           // 
+.................... // You must uncomment for your specific LCD                                  // 
+.................... //                                                                           // 
+.................... /////////////////////////////////////////////////////////////////////////////// 
+....................  
+.................... /* 
+.................... // This is for a 2x20 LCD 
+.................... void LCD_Position(unsigned char line, unsigned char column) 
+.................... { 
+.................... unsigned char i; 
+....................  
+.................... if (line == 1) 
+....................    i = 64; 
+.................... else 
+....................    i = 0;  //default is top line 
+....................   
+.................... if (column >= 0 && column <= 19)  
+....................    i += column;  
+.................... else 
+....................    i = 0;  // default is column 0  
+....................   
+.................... printf("%c%c",0xFE,128 + i); 
+....................  
+.................... } 
+.................... */ 
+....................  
+.................... // This is for a 4x20 LCD 
+.................... void LCD_Position(unsigned char line, unsigned char column) 
+.................... { 
+.................... unsigned char i; 
+....................  
+.................... if (line == 1) 
+*
+0228:  DECFSZ 10,W
+022A:  BRA    0230
+....................    i = 0; 
+022C:  CLRF   12
+.................... else if (line == 2) 
+022E:  BRA    0252
+0230:  MOVF   10,W
+0232:  SUBLW  02
+0234:  BNZ   023C
+....................    i = 64;   
+0236:  MOVLW  40
+0238:  MOVWF  12
+.................... else if (line == 3) 
+023A:  BRA    0252
+023C:  MOVF   10,W
+023E:  SUBLW  03
+0240:  BNZ   0248
+....................    i = 20; 
+0242:  MOVLW  14
+0244:  MOVWF  12
+.................... else if (line == 4) 
+0246:  BRA    0252
+0248:  MOVF   10,W
+024A:  SUBLW  04
+024C:  BNZ   0252
+....................    i = 84; 
+024E:  MOVLW  54
+0250:  MOVWF  12
+....................   
+.................... if (column >= 0 && column <= 19)  
+0252:  MOVF   11,W
+0254:  SUBLW  13
+0256:  BNC   025E
+....................    i += column;  
+0258:  MOVF   11,W
+025A:  ADDWF  12,F
+.................... else 
+025C:  BRA    0260
+....................    i = 0;  // default is column 0  
+025E:  CLRF   12
+....................   
+.................... printf("%c%c",0xFE,128 + i); 
+0260:  MOVLW  80
+0262:  ADDWF  12,W
+0264:  MOVWF  13
+0266:  MOVLW  FE
+0268:  BTFSS  F9E.4
+026A:  BRA    0268
+026C:  MOVWF  FAD
+026E:  MOVF   13,W
+0270:  BTFSS  F9E.4
+0272:  BRA    0270
+0274:  MOVWF  FAD
+....................  
+.................... } 
+0276:  RETLW  00
+....................  
+....................  
+....................  
+....................  
+....................  
+.................... #define BIT_VAL(x) (1 << x) // Identify selected Bit for operation 
+.................... #define HR12 0x80 // Sert de masque pour isoler le Bit 7 représentant le mode 12hr 
+....................                   // du registre des heures. 
+....................  
+.................... #define AM 0x00  
+.................... #define PM 0x40 // Sert de masque pour Bit 6 du Bit AM/PM du registre des heures. 
+.................... #define ENABLED 1 
+.................... #define DISABLED 0 
+....................  
+.................... BYTE set_hrs; 
+.................... BYTE ampm_test; 
+.................... BOOLEAN ampm;     
+.................... BOOLEAN mode_12hr; 
+....................  
+.................... void main() 
+.................... {    
+*
+0326:  CLRF   FF8
+0328:  BCF    FD0.7
+032A:  CLRF   FEA
+032C:  CLRF   FE9
+032E:  BSF    FB8.3
+0330:  MOVLW  08
+0332:  MOVWF  FAF
+0334:  MOVLW  02
+0336:  MOVWF  FB0
+0338:  MOVLW  A6
+033A:  MOVWF  FAC
+033C:  MOVLW  90
+033E:  MOVWF  FAB
+0340:  BSF    F93.1
+0342:  BSF    F93.0
+0344:  MOVLW  0C
+0346:  MOVWF  FC8
+0348:  MOVLW  28
+034A:  MOVWF  FC6
+034C:  BCF    FC7.7
+034E:  BCF    FC7.6
+0350:  MOVF   FC1,W
+0352:  ANDLW  C0
+0354:  IORLW  0F
+0356:  MOVWF  FC1
+0358:  MOVLW  07
+035A:  MOVWF  FB4
+035C:  CLRF   0B
+035E:  CLRF   0C
+....................     init_PCF8583();// initialise RTC    
+0360:  BRA    0128
+....................     // Mode 12 heures -> mode_12hr = ENABLED  
+....................     // Mode 24 heures -> mode_12hr = DISABLED 
+....................     mode_12hr = ENABLED;  
+0362:  BSF    0F.1
+....................      
+....................     switch(mode_12hr) 
+....................     {   
+0364:  MOVLW  00
+0366:  BTFSC  0F.1
+0368:  MOVLW  01
+036A:  XORLW  00
+036C:  BZ    0374
+036E:  XORLW  01
+0370:  BZ    037A
+0372:  BRA    0380
+....................        case 0:set_hrs=(0x23); //Set hour :00-23 
+0374:  MOVLW  23
+0376:  MOVWF  0D
+....................        break; 
+0378:  BRA    0380
+....................        case 1:set_hrs=(0x11 | PM | HR12); // Set hour :01-12,AM-PM 
+037A:  MOVLW  D1
+037C:  MOVWF  0D
+....................        break;        
+037E:  BRA    0380
+....................     } 
+....................                   // Set time and date: 
+....................                   // hh,mm,ss,DD,MM,YY,WD 
+....................    set_PCF8583(set_hrs,0x59,0x50,0x20,0x03,0x12,0x03); 
+0380:  MOVFF  0D,10
+0384:  MOVLW  59
+0386:  MOVWF  11
+0388:  MOVLW  50
+038A:  MOVWF  12
+038C:  MOVLW  20
+038E:  MOVWF  13
+0390:  MOVLW  03
+0392:  MOVWF  14
+0394:  MOVLW  12
+0396:  MOVWF  15
+0398:  MOVLW  03
+039A:  MOVWF  16
+039C:  BRA    014E
+....................     
+....................    while(TRUE) 
+....................    { 
+....................       get_PCF8583();// Reads date and time       
+039E:  BRA    01BE
+....................       rtc_value.yrs += PCF8583_YEAR_REG;  
+03A0:  MOVLW  10
+03A2:  ADDWF  09,F
+....................        
+....................       printf("\f");// Clear LCD display 
+03A4:  MOVLW  0C
+03A6:  BTFSS  F9E.4
+03A8:  BRA    03A6
+03AA:  MOVWF  FAD
+....................        
+....................       if(mode_12hr == ENABLED) 
+03AC:  BTFSS  0F.1
+03AE:  BRA    0414
+....................        { 
+....................           ampm_test = (rtc_value.hrs & BIT_VAL(6));  
+03B0:  MOVF   06,W
+03B2:  ANDLW  40
+03B4:  MOVWF  0E
+....................            
+....................           if(ampm_test == PM)ampm = 1; 
+03B6:  MOVF   0E,W
+03B8:  SUBLW  40
+03BA:  BNZ   03C0
+03BC:  BSF    0F.0
+....................            
+....................           else ampm = 0; 
+03BE:  BRA    03C2
+03C0:  BCF    0F.0
+....................            
+....................        rtc_value.hrs = (rtc_value.hrs & 0x1f); // ET logique pour définir heures. 
+03C2:  MOVLW  1F
+03C4:  ANDWF  06,F
+....................         
+....................        LCD_Position(2,15);// goto on 15th column third row(1st line)  
+03C6:  MOVLW  02
+03C8:  MOVWF  10
+03CA:  MOVLW  0F
+03CC:  MOVWF  11
+03CE:  RCALL  0228
+....................  
+....................           switch(ampm) 
+....................           { 
+03D0:  MOVLW  00
+03D2:  BTFSC  0F.0
+03D4:  MOVLW  01
+03D6:  XORLW  00
+03D8:  BZ    03E0
+03DA:  XORLW  01
+03DC:  BZ    03FA
+03DE:  BRA    0414
+....................              case 0:printf(" AM");break;              
+03E0:  MOVLW  20
+03E2:  BTFSS  F9E.4
+03E4:  BRA    03E2
+03E6:  MOVWF  FAD
+03E8:  MOVLW  41
+03EA:  BTFSS  F9E.4
+03EC:  BRA    03EA
+03EE:  MOVWF  FAD
+03F0:  MOVLW  4D
+03F2:  BTFSS  F9E.4
+03F4:  BRA    03F2
+03F6:  MOVWF  FAD
+03F8:  BRA    0414
+....................              case 1:printf(" PM");break;              
+03FA:  MOVLW  20
+03FC:  BTFSS  F9E.4
+03FE:  BRA    03FC
+0400:  MOVWF  FAD
+0402:  MOVLW  50
+0404:  BTFSS  F9E.4
+0406:  BRA    0404
+0408:  MOVWF  FAD
+040A:  MOVLW  4D
+040C:  BTFSS  F9E.4
+040E:  BRA    040C
+0410:  MOVWF  FAD
+0412:  BRA    0414
+....................           }        
+....................        }     
+....................              
+....................       LCD_Position(1,1);// goto on 1st column third row(1st line)       
+0414:  MOVLW  01
+0416:  MOVWF  10
+0418:  MOVWF  11
+041A:  RCALL  0228
+....................       printf("  -- PCF8583 --\n\r");       
+041C:  MOVLW  04
+041E:  MOVWF  FF6
+0420:  MOVLW  00
+0422:  MOVWF  FF7
+0424:  RCALL  0278
+....................       LCD_Position(2,1);// goto on 1st column third row(2th line) 
+0426:  MOVLW  02
+0428:  MOVWF  10
+042A:  MOVLW  01
+042C:  MOVWF  11
+042E:  RCALL  0228
+....................       printf("Time: %X:%X:%X\n\r",rtc_value.hrs,rtc_value.mins,rtc_value.secs);// Display time on second line 
+0430:  MOVLW  16
+0432:  MOVWF  FF6
+0434:  MOVLW  00
+0436:  MOVWF  FF7
+0438:  MOVLW  06
+043A:  MOVWF  10
+043C:  BRA    029A
+043E:  MOVFF  06,10
+0442:  MOVLW  37
+0444:  MOVWF  11
+0446:  RCALL  02BC
+0448:  MOVLW  3A
+044A:  BTFSS  F9E.4
+044C:  BRA    044A
+044E:  MOVWF  FAD
+0450:  MOVFF  05,10
+0454:  MOVLW  37
+0456:  MOVWF  11
+0458:  RCALL  02BC
+045A:  MOVLW  3A
+045C:  BTFSS  F9E.4
+045E:  BRA    045C
+0460:  MOVWF  FAD
+0462:  MOVFF  04,10
+0466:  MOVLW  37
+0468:  MOVWF  11
+046A:  RCALL  02BC
+046C:  MOVLW  0A
+046E:  BTFSS  F9E.4
+0470:  BRA    046E
+0472:  MOVWF  FAD
+0474:  MOVLW  0D
+0476:  BTFSS  F9E.4
+0478:  BRA    0476
+047A:  MOVWF  FAD
+....................       LCD_Position(3,1);// goto on 1st column third row(3th line) 
+047C:  MOVLW  03
+047E:  MOVWF  10
+0480:  MOVLW  01
+0482:  MOVWF  11
+0484:  RCALL  0228
+....................        
+....................       switch(rtc_value.dows) 
+....................       { 
+0486:  MOVLW  01
+0488:  SUBWF  0A,W
+048A:  ADDLW  F9
+048C:  BC    04E8
+048E:  ADDLW  07
+0490:  GOTO   0538
+....................          // process weekday and display it 
+....................          case 1:printf("Date: Dim-");break; 
+0494:  MOVLW  28
+0496:  MOVWF  FF6
+0498:  MOVLW  00
+049A:  MOVWF  FF7
+049C:  RCALL  0278
+049E:  BRA    04E8
+....................          case 2:printf("Date: Lun-");break; 
+04A0:  MOVLW  34
+04A2:  MOVWF  FF6
+04A4:  MOVLW  00
+04A6:  MOVWF  FF7
+04A8:  RCALL  0278
+04AA:  BRA    04E8
+....................          case 3:printf("Date: Mar-");break; 
+04AC:  MOVLW  40
+04AE:  MOVWF  FF6
+04B0:  MOVLW  00
+04B2:  MOVWF  FF7
+04B4:  RCALL  0278
+04B6:  BRA    04E8
+....................          case 4:printf("Date: Mer-");break; 
+04B8:  MOVLW  4C
+04BA:  MOVWF  FF6
+04BC:  MOVLW  00
+04BE:  MOVWF  FF7
+04C0:  RCALL  0278
+04C2:  BRA    04E8
+....................          case 5:printf("Date: Jeu-");break; 
+04C4:  MOVLW  58
+04C6:  MOVWF  FF6
+04C8:  MOVLW  00
+04CA:  MOVWF  FF7
+04CC:  RCALL  0278
+04CE:  BRA    04E8
+....................          case 6:printf("Date: Ven-");break; 
+04D0:  MOVLW  64
+04D2:  MOVWF  FF6
+04D4:  MOVLW  00
+04D6:  MOVWF  FF7
+04D8:  RCALL  0278
+04DA:  BRA    04E8
+....................          case 7:printf("Date: Sam-");break; 
+04DC:  MOVLW  70
+04DE:  MOVWF  FF6
+04E0:  MOVLW  00
+04E2:  MOVWF  FF7
+04E4:  RCALL  0278
+04E6:  BRA    04E8
+....................       } 
+....................  
+....................       printf("%X/%X/%X\n\r",rtc_value.days,rtc_value.mths,rtc_value.yrs); 
+04E8:  MOVFF  07,10
+04EC:  MOVLW  37
+04EE:  MOVWF  11
+04F0:  RCALL  02BC
+04F2:  MOVLW  2F
+04F4:  BTFSS  F9E.4
+04F6:  BRA    04F4
+04F8:  MOVWF  FAD
+04FA:  MOVFF  08,10
+04FE:  MOVLW  37
+0500:  MOVWF  11
+0502:  RCALL  02BC
+0504:  MOVLW  2F
+0506:  BTFSS  F9E.4
+0508:  BRA    0506
+050A:  MOVWF  FAD
+050C:  MOVFF  09,10
+0510:  MOVLW  37
+0512:  MOVWF  11
+0514:  RCALL  02BC
+0516:  MOVLW  0A
+0518:  BTFSS  F9E.4
+051A:  BRA    0518
+051C:  MOVWF  FAD
+051E:  MOVLW  0D
+0520:  BTFSS  F9E.4
+0522:  BRA    0520
+0524:  MOVWF  FAD
+....................              
+....................       delay_ms(1000); // Taux de rafraichissement du l'affichage. 
+0526:  MOVLW  04
+0528:  MOVWF  10
+052A:  MOVLW  FA
+052C:  MOVWF  11
+052E:  BRA    02FE
+0530:  DECFSZ 10,F
+0532:  BRA    052A
+....................    } 
+0534:  BRA    039E
+.................... } 
+....................  
+....................  
+0536:  SLEEP 
+
+Configuration Fuses:
+   Word  1: CC3F   IESO FCMEN HS PLL12 CPUDIV4 USBDIV
+   Word  2: 0E3F   BROWNOUT WDT128 NOWDT BORV20 NOPUT VREGEN
+   Word  3: 8700   PBADEN CCP2C1 MCLR LPT1OSC
+   Word  4: 00A5   STVREN NODEBUG LVP NOXINST ICPRT
+   Word  5: C00F   NOPROTECT NOCPD NOCPB
+   Word  6: E00F   NOWRT NOWRTD NOWRTC NOWRTB
+   Word  7: 400F   NOEBTR NOEBTRB

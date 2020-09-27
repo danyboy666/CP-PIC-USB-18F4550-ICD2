@@ -1,0 +1,122 @@
+000     @SCRATCH
+001     @SCRATCH
+001     _RETURN_
+002     @SCRATCH
+003     @SCRATCH
+005     MAIN.sec
+006     MAIN.min
+007     MAIN.hrs
+008     MAIN.day
+009     MAIN.month
+00A     MAIN.yr
+00B     MAIN.dow
+00C     @PSTRINGCN_9600_31766_31767.P1
+00C     ds1307_set_date_time.day
+00C     @PRINTF_D_9600_31766_31767.P1
+00C     ds1307_init.seconds
+00C     ds1307_get_date.@SCRATCH1
+00C     ds1307_get_time.@SCRATCH1
+00C     MAIN.@SCRATCH1
+00C     @PSTRINGC_9600_31766_31767.@SCRATCH1
+00D     @delay_ms1.P1
+00D     ds1307_set_date_time.mth
+00D     @PRINTF_D_9600_31766_31767.P1
+00D     ds1307_init.@SCRATCH1
+00D     @PSTRINGC_9600_31766_31767.@SCRATCH2
+00D     @PSTRINGCN_9600_31766_31767.@SCRATCH1
+00E     ds1307_set_date_time.year
+00E     @PSTRINGCN_9600_31766_31767.@SCRATCH2
+00E     @PRINTF_D_9600_31766_31767.@SCRATCH1
+00F     ds1307_set_date_time.dow
+00F     @PRINTF_D_9600_31766_31767.@SCRATCH2
+010     @I2C_READU_1.P1
+010     ds1307_set_date_time.hr
+010     @PRINTF_D_9600_31766_31767.@SCRATCH3
+011     bcd2bin.bcd_value
+011     ds1307_set_date_time.min
+011     @PRINTF_D_9600_31766_31767.@SCRATCH4
+012     bcd2bin.temp
+012     @DIV88.P1
+012     ds1307_set_date_time.sec
+013     @DIV88.P1
+013     bin2bcd.binary_value
+013     ds1307_set_date_time.@SCRATCH1
+013     bcd2bin.@SCRATCH1
+014     bin2bcd.temp
+014     @I2C_WRITEU_1.P1
+014     @DIV88.@SCRATCH1
+015     bin2bcd.retval
+F83     PSP_DATA
+FB4.6   C1OUT
+FB4.7   C2OUT
+FBB     CCP_2_LOW
+FBB     CCP_2
+FBC     CCP_2_HIGH
+FBE     CCP_1_LOW
+FBE     CCP_1
+FBF     CCP_1_HIGH
+FE1-FE2 @WRITE_PACKED_MEMORY.P1
+FE1-FE2 @READ_PACKED_MEMORY.P2
+FE9-FEA @WRITE_PROGRAM_MEMORY.P1
+FE9-FEA @READ_PACKED_MEMORY.P2
+FE9-FEA @WRITE_PACKED_MEMORY.P3
+FE9-FEA @READ_PROGRAM_MEMORY.P4
+FF6-FF8 @WRITE_PROGRAM_MEMORY.P1
+FF6-FF8 @READ_PROGRAM_MEMORY.P2
+
+ROM Allocation:
+0084  @delay_ms1
+00AA  @I2C_WRITEU_1
+00C6  @I2C_READU_1
+012C  ds1307_init
+01B0  ds1307_set_date_time
+041E  ds1307_get_date
+0490  ds1307_get_time
+0108  bin2bcd
+00E2  bcd2bin
+035E  MAIN
+0004  @const111
+0060  @PSTRINGC_9600_31766_31767
+001A  @const114
+0246  @PSTRINGCN_9600_31766_31767
+0266  @DIV88
+028E  @PRINTF_D_9600_31766_31767
+0034  @const123
+0044  @const124
+035E  @cinit
+
+
+User Memory space: 
+
+User Memory space: 
+
+Project Directory:
+    F:\Electro\Programmation\Programmations_PIC_C\243-444-RK\Lab no 5\partie 1\
+
+Project Files:
+    main lab5a.c
+    main lab5a.h
+    C:\Program Files\PICC\devices\18F4550.h
+    ds1307paul.c
+
+Units:
+    F:\Electro\Programmation\Programmations_PIC_C\243-444-RK\Lab no 5\partie 1\main lab5a (main)
+
+Compiler Settings:
+    Processor:      PIC18F4550
+    Pointer Size:   16
+    ADC Range:      0-255
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+
+Output Files:
+    Errors:      main lab5a.err
+    Ext Symbols: main lab5a.esym
+    INHX32:      main lab5a.hex
+    Symbols:     main lab5a.sym
+    List:        main lab5a.lst
+    Debug/COFF:  main lab5a.cof
+    Project:     main lab5a.PJT
+    Call Tree:   main lab5a.tre
+    Statistics:  main lab5a.sta

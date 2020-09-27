@@ -1,0 +1,5 @@
+D G "__PCH__" 0 19 ""4.104""
+D G "__DEVICE__" 0 19 ""
+D G "__DATE__" 0 19 ""31-mars-12""
+D G "__TIME__" 0 19 ""22:41:17"" "/                               DS1307.C                                   ///"
+C L "BYTE" 0 0 12 "FUNCTION"

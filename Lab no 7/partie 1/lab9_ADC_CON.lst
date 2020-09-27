@@ -1,0 +1,287 @@
+CCS PCH C Compiler, Version 4.104, 5967               23-mars-12 02:27
+
+               Filename: F:\Electro\Programmation\Programmations_PIC_C\243-444-RK\Lab no 7\partie 1\lab9_ADC_CON.lst
+
+               ROM used: 1310 bytes (4%)
+                         Largest free fragment is 31458
+               RAM used: 11 (1%) at main() level
+                         36 (2%) worst case
+               Stack:    2 locations
+
+*
+0000:  GOTO   040A
+.................... ///////////////////////////////////////////////////////////////////////////////// 
+.................... //                 Applications des microcontrolleurs               243-444-RK // 
+.................... //                         Laboratoire no. 7                                   // 
+.................... //         Programme no 1: Expérimentation avec la conversion analogique       // 
+.................... //                         digital du microcontrolleur 18F4550.                // 
+.................... //                                                                             // 
+.................... //  Ce programme utilise la fonction de conversion analogique digital          // 
+.................... //  et en utilisant un échantillonage sur 16 bits. Ceci convertie la sortie    // 
+.................... //  zero du port A en voltmêtre digital.                                       // 
+.................... //                                                                             // 
+.................... ///////////////////////////////////////////////////////////////////////////////// 
+.................... //                                                                             // 
+.................... // Dany Ferron 2012                                                            // 
+.................... //                                                                             // 
+.................... ///////////////////////////////////////////////////////////////////////////////// 
+.................... //                                                                             // 
+.................... //     ANA0 est le port utilisé pour la conversion analogique digital          // 
+.................... //              _________________                                              // 
+.................... //            -|1              40|-RB7                                         // 
+.................... //    RA0/ANA0-|                 |-RB6                                         // 
+.................... //            -|    PIC18F4550   |-RB5                                         // 
+.................... //            -|      @20MHz     |-RB4                                         // 
+.................... //            -|                 |-RB3                                         // 
+.................... //            -|                 |-RB2                                         // 
+.................... //            -|                 |-RB1                                         // 
+.................... //            -|                 |-RB0                                         // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-RC7/RX <- This is the connection to the     // 
+.................... //            -|                 |-RC6/TX -> MELabs serial LCD controller      // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //         RD0-|                 |-                                            // 
+.................... //         RD1-|20             21|-RD2                                         // 
+.................... //              -----------------                                              // 
+.................... //                                                                             // 
+.................... ///////////////////////////////////////////////////////////////////////////////// 
+....................  
+.................... #include "lab9_ADC_CON.h" 
+.................... #include <18F4550.h> 
+.................... //////// Standard Header file for the PIC18F4550 device //////////////// 
+.................... #device PIC18F4550 
+.................... #list 
+....................  
+.................... #device adc=8 
+....................  
+.................... #FUSES NOWDT                    //No Watch Dog Timer 
+.................... #FUSES WDT128                   //Watch Dog Timer uses 1:128 Postscale 
+.................... #FUSES HS                       //High speed Osc (> 4mhz) 
+.................... #FUSES NOPROTECT                //Code not protected from reading 
+.................... #FUSES BROWNOUT                 //Reset when brownout detected 
+.................... #FUSES BORV20                   //Brownout reset at 2.0V 
+.................... #FUSES NOPUT                    //No Power Up Timer 
+.................... #FUSES NOCPD                    //No EE protection 
+.................... #FUSES STVREN                   //Stack full/underflow will cause reset 
+.................... #FUSES NODEBUG                  //No Debug mode for ICD 
+.................... #FUSES LVP                      //Low Voltage Programming on B3(PIC16) or B5(PIC18) 
+.................... #FUSES NOWRT                    //Program memory not write protected 
+.................... #FUSES NOWRTD                   //Data EEPROM not write protected 
+.................... #FUSES IESO                     //Internal External Switch Over mode enabled 
+.................... #FUSES FCMEN                    //Fail-safe clock monitor enabled 
+.................... #FUSES PBADEN                   //PORTB pins are configured as analog input channels on RESET 
+.................... #FUSES NOWRTC                   //configuration not registers write protected 
+.................... #FUSES NOWRTB                   //Boot block not write protected 
+.................... #FUSES NOEBTR                   //Memory not protected from table reads 
+.................... #FUSES NOEBTRB                  //Boot block not protected from table reads 
+.................... #FUSES NOCPB                    //No Boot Block code protection 
+.................... #FUSES MCLR                     //Master Clear pin enabled 
+.................... #FUSES LPT1OSC                  //Timer1 configured for low-power operation 
+.................... #FUSES NOXINST                  //Extended set extension and Indexed Addressing mode disabled (Legacy mode) 
+.................... #FUSES PLL12                    //Divide By 12(48MHz oscillator input) 
+.................... #FUSES CPUDIV4                  //System Clock by 4 
+.................... #FUSES USBDIV                   //USB clock source comes from PLL divide by 2 
+.................... #FUSES VREGEN                   //USB voltage regulator enabled 
+.................... #FUSES ICPRT                    //ICPRT enabled 
+....................  
+.................... #use delay(clock=20000000) 
+*
+0032:  CLRF   FEA
+0034:  MOVLW  0B
+0036:  MOVWF  FE9
+0038:  MOVF   FEF,W
+003A:  BZ    0056
+003C:  MOVLW  06
+003E:  MOVWF  01
+0040:  CLRF   00
+0042:  DECFSZ 00,F
+0044:  BRA    0042
+0046:  DECFSZ 01,F
+0048:  BRA    0040
+004A:  MOVLW  7B
+004C:  MOVWF  00
+004E:  DECFSZ 00,F
+0050:  BRA    004E
+0052:  DECFSZ FEF,F
+0054:  BRA    003C
+0056:  GOTO   0460 (RETURN)
+....................  
+....................  
+....................  
+....................  
+....................  
+.................... long int value;    
+.................... double Vfinal;    
+....................  
+.................... void main() 
+.................... { 
+*
+040A:  CLRF   FF8
+040C:  BCF    FD0.7
+040E:  CLRF   FEA
+0410:  CLRF   FE9
+0412:  BSF    FB8.3
+0414:  MOVLW  08
+0416:  MOVWF  FAF
+0418:  MOVLW  02
+041A:  MOVWF  FB0
+041C:  MOVLW  A6
+041E:  MOVWF  FAC
+0420:  MOVLW  90
+0422:  MOVWF  FAB
+0424:  MOVF   FC1,W
+0426:  ANDLW  C0
+0428:  IORLW  0F
+042A:  MOVWF  FC1
+042C:  MOVLW  07
+042E:  MOVWF  FB4
+....................    setup_adc_ports(AN0|VSS_VDD); 
+0430:  MOVF   FC1,W
+0432:  ANDLW  C0
+0434:  IORLW  0E
+0436:  MOVWF  FC1
+....................    setup_adc(ADC_CLOCK_INTERNAL); 
+0438:  BSF    FC0.0
+043A:  BSF    FC0.1
+043C:  BSF    FC0.2
+043E:  BCF    FC0.7
+0440:  BSF    FC2.0
+....................        
+.................... #define TX1   PIN_C6 
+.................... #define RX1   PIN_C7 
+....................  
+....................    #use rs232(baud = 9600, xmit = TX1, rcv = RX1) 
+....................    #use fast_io(C) 
+....................    set_tris_c(0b10000000); //rc7 en entree, rx1. 
+0442:  MOVLW  80
+0444:  MOVWF  F94
+....................  
+....................       printf("%c%c",0xfe,0x1); 
+0446:  MOVLW  FE
+0448:  BTFSS  F9E.4
+044A:  BRA    0448
+044C:  MOVWF  FAD
+044E:  MOVLW  01
+0450:  BTFSS  F9E.4
+0452:  BRA    0450
+0454:  MOVWF  FAD
+....................  
+....................    while(true) 
+....................    { 
+....................       delay_ms(400); 
+0456:  MOVLW  02
+0458:  MOVWF  0A
+045A:  MOVLW  C8
+045C:  MOVWF  0B
+045E:  BRA    0032
+0460:  DECFSZ 0A,F
+0462:  BRA    045A
+....................       printf("\f"); 
+0464:  MOVLW  0C
+0466:  BTFSS  F9E.4
+0468:  BRA    0466
+046A:  MOVWF  FAD
+....................       value = read_adc(); // Lecture du port et conversion de la valeure  
+046C:  BSF    FC2.1
+046E:  BTFSC  FC2.1
+0470:  BRA    046E
+0472:  MOVF   FC4,W
+0474:  CLRF   05
+0476:  MOVWF  04
+....................                           // recue sur le port et la met en variable int16(mot). 
+....................  
+....................       Vfinal = value * 0.01953125; // Conversion en variable à virgule flottante. 
+0478:  MOVFF  05,0B
+047C:  MOVFF  04,0A
+0480:  BRA    005A
+0482:  MOVFF  03,1A
+0486:  MOVFF  02,19
+048A:  MOVFF  01,18
+048E:  MOVFF  00,17
+0492:  CLRF   1E
+0494:  CLRF   1D
+0496:  MOVLW  20
+0498:  MOVWF  1C
+049A:  MOVLW  79
+049C:  MOVWF  1B
+049E:  RCALL  0092
+04A0:  MOVFF  03,09
+04A4:  MOVFF  02,08
+04A8:  MOVFF  01,07
+04AC:  MOVFF  00,06
+....................          
+....................       printf("%c%c",0xfe,0x84);       
+04B0:  MOVLW  FE
+04B2:  BTFSS  F9E.4
+04B4:  BRA    04B2
+04B6:  MOVWF  FAD
+04B8:  MOVLW  84
+04BA:  BTFSS  F9E.4
+04BC:  BRA    04BA
+04BE:  MOVWF  FAD
+....................       printf("%s","Voltmetre C.C"); 
+04C0:  MOVLW  04
+04C2:  MOVWF  FF6
+04C4:  MOVLW  00
+04C6:  MOVWF  FF7
+04C8:  RCALL  0184
+....................       printf("%c%c",0xfe,0xc0); 
+04CA:  MOVLW  FE
+04CC:  BTFSS  F9E.4
+04CE:  BRA    04CC
+04D0:  MOVWF  FAD
+04D2:  MOVLW  C0
+04D4:  BTFSS  F9E.4
+04D6:  BRA    04D4
+04D8:  MOVWF  FAD
+....................       printf("%s","(precision 8 bits)"); 
+04DA:  MOVLW  12
+04DC:  MOVWF  FF6
+04DE:  MOVLW  00
+04E0:  MOVWF  FF7
+04E2:  RCALL  0184
+....................       printf("%c%c",0xfe,0xd8); 
+04E4:  MOVLW  FE
+04E6:  BTFSS  F9E.4
+04E8:  BRA    04E6
+04EA:  MOVWF  FAD
+04EC:  MOVLW  D8
+04EE:  BTFSS  F9E.4
+04F0:  BRA    04EE
+04F2:  MOVWF  FAD
+....................       printf("%4.3f Volts",Vfinal);     
+04F4:  MOVLW  03
+04F6:  MOVWF  FE9
+04F8:  MOVFF  09,0D
+04FC:  MOVFF  08,0C
+0500:  MOVFF  07,0B
+0504:  MOVFF  06,0A
+0508:  MOVWF  0E
+050A:  BRA    0260
+050C:  MOVLW  2B
+050E:  MOVWF  FF6
+0510:  MOVLW  00
+0512:  MOVWF  FF7
+0514:  MOVLW  06
+0516:  MOVWF  0A
+0518:  BRA    03E8
+....................       } 
+051A:  BRA    0456
+.................... } 
+....................  
+051C:  SLEEP 
+
+Configuration Fuses:
+   Word  1: CC3F   IESO FCMEN HS PLL12 CPUDIV4 USBDIV
+   Word  2: 0E3F   BROWNOUT WDT128 NOWDT BORV20 NOPUT VREGEN
+   Word  3: 8700   PBADEN CCP2C1 MCLR LPT1OSC
+   Word  4: 00A5   STVREN NODEBUG LVP NOXINST ICPRT
+   Word  5: C00F   NOPROTECT NOCPD NOCPB
+   Word  6: E00F   NOWRT NOWRTD NOWRTC NOWRTB
+   Word  7: 400F   NOEBTR NOEBTRB

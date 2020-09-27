@@ -1,0 +1,208 @@
+//////////////////////////////////////////////////////////////////////////////// 
+///                           DS1307_db666.C                                 /// 
+///                     Driver for Real Time Clock                           /// 
+///                                                                          /// 
+/// ds1307_init() - Enable oscillator without clearing the seconds register  /// 
+///                 used when PIC loses power and DS1307 run from 3V BAT     /// 
+///                  (Must be called at the start of the program)            ///
+/// write_DS1307() - Writes adress and data to the DS1307                    ///
+/// read_DS1307()  - Reads the data from adress location                     ///
+///                                                                          ///
+//////////////////////////////////////////////////////////////////////////////// 
+///                                                                          ///
+/// (c)Copyright 2012: Dany Ferron                                           ///
+///                                                                          ///
+////////////////////////////////////////////////////////////////////////////////
+
+
+// TODO: Alarm register 
+
+/*       Registre de controle/status    
+
+                  memory location 00
+                  reset state: 0000 0000
+            LSB       
+      Bit    0    timer flag (50% duty factor
+                  seconds flag if alarm
+                  enable bit is 0)
+                  
+      Bit    1    alarm flag (50% duty factor
+                  minutes flag if alarm
+                  enable bit is 0)
+                  
+      Bit    2    alarm enable bit:
+                  0 alarm disabled: flags toggle
+                  alarm control register disabled
+                  (memory locations 08 to 0F
+                  are free RAM space)
+                  1 enable alarm control register
+                  (memory location 08 is the
+                  alarm control register)
+                  
+      Bit    3    mask flag:
+                  0 read locations 05 to 06
+                  unmasked
+                  1 read date and month count
+                  directly
+                  
+      Bit   4-5   function mode :
+                  00 clock mode 32.768 kHz
+                  01 clock mode 50 Hz
+                  10 event-counter mode
+                  11 test modes
+                  
+      Bit    6    hold last count flag :
+                  0 count
+                  1 store and hold last count in
+                  capture latches
+                  
+      Bit    7    stop counting flag :
+                  0 count pulses
+                  1 stop counting, reset divider
+            MSB
+            
+
+         Format du compteur des heures 
+         
+                  memory location 04 (hours counter)
+                  reset state: 0000 0000
+            LSB      
+      Bit   0-3   unit hours BCD
+            
+      Bit   4-5   ten hours (0 to 2 binary)
+                  
+      Bit    6    AM/PM flag:
+                  0 AM
+                  1 PM
+                  
+      Bit    7    format:
+                  0 24 h format, AM/PM flag
+                  remains unchanged
+                  1 12 h format, AM/PM flag
+                  will be updated
+            MSB
+*/
+#ifndef PCF8583_WRITE_ADDRESS
+//#define PCF8583_WRITE_ADDRESS 0xA0
+#define PCF8583_WRITE_ADDRESS 0xA2
+//#define PCF8583_READ_ADDRESS 0xA1
+#define PCF8583_READ_ADDRESS 0xA3
+#endif
+// Register addresses
+#define PCF8583_CTRL_STATUS_REG 0x00
+#define PCF8583_100S_REG 0x01
+#define PCF8583_SECONDS_REG 0x02
+#define PCF8583_MINUTES_REG 0x03
+#define PCF8583_HOURS_REG 0x04
+#define PCF8583_DATE_REG 0x05
+#define PCF8583_MONTHS_REG 0x06
+#define PCF8583_TIMER_REG 0x07
+#define PCF8583_ALARM_CONTROL_REG 0x08
+#define PCF8583_ALARM_100S_REG 0x09
+#define PCF8583_ALARM_SECS_REG 0x0A
+#define PCF8583_ALARM_MINS_REG 0x0B
+#define PCF8583_ALARM_HOURS_REG 0x0C
+#define PCF8583_ALARM_DATE_REG 0x0D
+#define PCF8583_ALARM_MONTHS_REG 0x0E
+#define PCF8583_ALARM_TIMER_REG 0x0F
+// Use the first NVRAM address for the year byte.
+#define PCF8583_YEAR_REG 0x10
+// Commands for the Control/Status register.
+#define PCF8583_START_COUNTING 0x00
+#define PCF8583_STOP_COUNTING 0x80
+#define PCF8583_LATCH_COUNTING 0x40 
+                       
+  struct rtc_var // Functions prototypes
+  { 
+   BYTE secs; 
+   BYTE mins; 
+   BYTE hrs; 
+   BYTE days; 
+   BYTE mths; 
+   BYTE yrs; 
+   BYTE dows;
+  }
+  rtc_value;
+  
+  void config_PCF8583(BYTE cfg) // Write cfg to config register
+  { 
+    i2c_start();
+    i2c_write(PCF8583_WRITE_ADDRESS);
+    i2c_write(PCF8583_CTRL_STATUS_REG); // Pointe vers le registre de controle 
+    i2c_write(cfg);
+    i2c_stop();
+  }
+
+  BYTE read_PCF8583(BYTE rtcreg) // rtc read subroutine
+  { 
+    BYTE data_in;
+    
+    i2c_start();
+    i2c_write(PCF8583_WRITE_ADDRESS); // Device address
+    i2c_write(rtcreg); // Send address of register to read
+    i2c_start(); // Restart
+    i2c_write(PCF8583_READ_ADDRESS);
+    data_in=i2c_read(0); // Now read from slave
+    i2c_stop();
+    return(data_in);
+  }
+
+  void write_PCF8583(BYTE rtcreg, BYTE rtc_data) // Writes rtc_data at address rtcreg
+  { 
+    i2c_start();
+    i2c_write(PCF8583_WRITE_ADDRESS); // Device address
+    i2c_write(rtcreg);
+    i2c_write(rtc_data);
+    i2c_stop();
+  }
+
+  void init_PCF8583() 
+  {
+    
+      config_PCF8583(PCF8583_CTRL_STATUS_REG); // Setup config
+      
+      BYTE tmp;
+   //   config_PCF8583(0x90); // Setup config, with 1Hz output on int
+      bit_clear(tmp,6);
+      write_PCF8583(0x02, tmp);
+      tmp = read_PCF8583(0x00); // Make sure oscillator is running (bit 7 reg0 = 0)
+      bit_clear(tmp,7);
+      write_PCF8583(0x00, tmp);    
+  }
+
+  void get_PCF8583() // Lecture des données de temps.
+  {       
+      BYTE tmp;
+      // Traitement de l'heure.
+      rtc_value.secs=read_PCF8583(PCF8583_SECONDS_REG) & 0x7f;
+      rtc_value.mins=read_PCF8583(PCF8583_MINUTES_REG) & 0x7f;
+      rtc_value.hrs=read_PCF8583(PCF8583_HOURS_REG) & 0x7f;
+      // Traitement de la date.
+      tmp=read_PCF8583(PCF8583_DATE_REG); // Jour
+      rtc_value.days = tmp & 0x3f; // day is 6 lower bits
+      rtc_value.yrs = (tmp & 0xc0) >> 6; // year is 2 upper bits
+      tmp=read_PCF8583(PCF8583_MONTHS_REG); // mois
+      rtc_value.mths = tmp & 0x1f; // month is 5 lower bits
+      rtc_value.dows = (tmp & 0xe0) >> 5; // weekday is 3 upper bits
+  }
+  // Écriture des données de temps.
+  void set_PCF8583(BYTE hr, BYTE min, BYTE sec, BYTE day, BYTE mth, BYTE yr, BYTE dow) 
+  {    
+      BYTE tmp;
+      
+      write_PCF8583(PCF8583_SECONDS_REG, sec & 0x7f);
+      write_PCF8583(PCF8583_MINUTES_REG, min & 0x7f);
+      // Le masque & 0x3f est apliqué dans le programme principal pour pouvoir
+      // traiter le Bit 6 du drapeau AM/PM et le Bit 7 pour celui du mode 12hr.
+      // Voir la decription du format du compteur des heures.  
+      write_PCF8583(PCF8583_HOURS_REG, hr);
+      tmp = day & 0x3f;
+      tmp = tmp | ((yr % 4) << 6); // year is 2 upper bits of byte
+      write_PCF8583(PCF8583_DATE_REG, tmp);
+      tmp = mth & 0x1f;
+      tmp = tmp | (dow << 5); // weekday is 3 upper bits of byte
+      write_PCF8583(PCF8583_MONTHS_REG, tmp); 
+  }
+
+
+

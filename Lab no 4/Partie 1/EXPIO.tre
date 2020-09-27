@@ -1,0 +1,11 @@
+ÀÄEXPIO
+   ÀÄMAIN  0/184  Ram=2
+      ÃÄ??0??
+      ÃÄLCD_ClearDisplay  0/20  Ram=0
+      ÃÄread_expanded_inputs  0/64  Ram=3
+      ÃÄLCD_Position  0/82  Ram=4
+      ÃÄ@PSTRINGCN_9600_31766_31767  0/34  Ram=3
+      ÃÄ@PRINTF_U_9600_31766_31767  0/110  Ram=2
+      ³  ÃÄ@DIV88  0/40  Ram=3
+      ³  ÀÄ@DIV88  0/40  Ram=3
+      ÀÄwrite_expanded_outputs  0/82  Ram=4

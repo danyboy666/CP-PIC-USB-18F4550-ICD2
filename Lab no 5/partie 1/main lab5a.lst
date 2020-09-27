@@ -1,0 +1,772 @@
+CCS PCH C Compiler, Version 4.104, 5967               31-mars-12 22:41
+
+               Filename: F:\Electro\Programmation\Programmations_PIC_C\243-444-RK\Lab no 5\partie 1\main lab5a.lst
+
+               ROM used: 1488 bytes (5%)
+                         Largest free fragment is 31280
+               RAM used: 12 (1%) at main() level
+                         21 (1%) worst case
+               Stack:    2 locations
+
+*
+0000:  GOTO   035E
+.................... ///////////////////////////////////////////////////////////////////////////////// 
+.................... //                 Applications des microcontrolleurs               243-444-RK // 
+.................... //                         Laboratoire no. 5 (partie 1)                        // 
+.................... //         Programme no 1: Expérimentation avec le protocole I²C               // 
+.................... //                                                                             // 
+.................... //                                                                             // 
+.................... // Le module DS1307 RTC (pour Real Time Clock) est une horloge en mesure de    // 
+.................... // fournir secondes, minutes, heures, jour, mois & année avec prise en compte  // 
+.................... // des années bisextiles  jusqu'en 2100. Une pile de sauvegarde peut être mise // 
+.................... // en place pour conserver les données en cas de coupure de l'alim extérieure. // 
+.................... //                                                                             // 
+.................... // Le DS1307 s'interface sur le bus I²C.                                       // 
+.................... //                                                                             // 
+.................... ///////////////////////////////////////////////////////////////////////////////// 
+.................... //                                                                             // 
+.................... // (c)Copyright 2012 : Dany Ferron 2012                                        // 
+.................... //                                                                             // 
+.................... ///////////////////////////////////////////////////////////////////////////////// 
+.................... //                                                                             // 
+.................... //                                                                             // 
+.................... //              _________________                                              // 
+.................... //            -|1              40|-RB7                                         // 
+.................... //            -|                 |-RB6                                         // 
+.................... //            -|    PIC18F4550   |-RB5                                         // 
+.................... //            -|      @20MHz     |-RB4                                         // 
+.................... //            -|                 |-RB3                                         // 
+.................... //            -|                 |-RB2                                         // 
+.................... //            -|                 |-RB1 <-> SLC (serial clock)                  // 
+.................... //            -|                 |-RB0 <-> SDA (serial data)                   // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-RC7/RX <- This is the connection to the     // 
+.................... //            -|                 |-RC6/TX -> MELabs serial LCD controller      // 
+.................... //            -|                 |-                                            // 
+.................... //            -|                 |-                                            // 
+.................... //         RD0-|                 |-                                            // 
+.................... //         RD1-|20             21|-RD2                                         // 
+.................... //              -----------------                                              // 
+.................... //                                                                             // 
+.................... ///////////////////////////////////////////////////////////////////////////////// 
+....................  
+.................... #include "main lab5a.h" 
+.................... #include <18F4550.h> 
+.................... //////// Standard Header file for the PIC18F4550 device //////////////// 
+.................... #device PIC18F4550 
+.................... #list 
+....................  
+.................... #device adc=8 
+....................  
+.................... #FUSES NOWDT                    //No Watch Dog Timer 
+.................... #FUSES WDT128                   //Watch Dog Timer uses 1:128 Postscale 
+.................... #FUSES HS                       //High speed Osc (> 4mhz) 
+.................... #FUSES NOPROTECT                //Code not protected from reading 
+.................... #FUSES BROWNOUT                 //Reset when brownout detected 
+.................... #FUSES BORV20                   //Brownout reset at 2.0V 
+.................... #FUSES NOPUT                    //No Power Up Timer 
+.................... #FUSES NOCPD                    //No EE protection 
+.................... #FUSES STVREN                   //Stack full/underflow will cause reset 
+.................... #FUSES NODEBUG                  //No Debug mode for ICD 
+.................... #FUSES LVP                      //Low Voltage Programming on B3(PIC16) or B5(PIC18) 
+.................... #FUSES NOWRT                    //Program memory not write protected 
+.................... #FUSES NOWRTD                   //Data EEPROM not write protected 
+.................... #FUSES IESO                     //Internal External Switch Over mode enabled 
+.................... #FUSES FCMEN                    //Fail-safe clock monitor enabled 
+.................... #FUSES PBADEN                   //PORTB pins are configured as analog input channels on RESET 
+.................... #FUSES NOWRTC                   //configuration not registers write protected 
+.................... #FUSES NOWRTB                   //Boot block not write protected 
+.................... #FUSES NOEBTR                   //Memory not protected from table reads 
+.................... #FUSES NOEBTRB                  //Boot block not protected from table reads 
+.................... #FUSES NOCPB                    //No Boot Block code protection 
+.................... #FUSES MCLR                     //Master Clear pin enabled 
+.................... #FUSES LPT1OSC                  //Timer1 configured for low-power operation 
+.................... #FUSES NOXINST                  //Extended set extension and Indexed Addressing mode disabled (Legacy mode) 
+.................... #FUSES PLL12                    //Divide By 12(48MHz oscillator input) 
+.................... #FUSES CPUDIV4                  //System Clock by 4 
+.................... #FUSES USBDIV                   //USB clock source comes from PLL divide by 2 
+.................... #FUSES VREGEN                   //USB voltage regulator enabled 
+.................... #FUSES ICPRT                    //ICPRT enabled 
+....................  
+.................... #use delay(clock=20000000) 
+*
+0084:  CLRF   FEA
+0086:  MOVLW  0D
+0088:  MOVWF  FE9
+008A:  MOVF   FEF,W
+008C:  BZ    00A8
+008E:  MOVLW  06
+0090:  MOVWF  01
+0092:  CLRF   00
+0094:  DECFSZ 00,F
+0096:  BRA    0094
+0098:  DECFSZ 01,F
+009A:  BRA    0092
+009C:  MOVLW  7B
+009E:  MOVWF  00
+00A0:  DECFSZ 00,F
+00A2:  BRA    00A0
+00A4:  DECFSZ FEF,F
+00A6:  BRA    008E
+00A8:  RETLW  00
+.................... #use rs232(baud=9600,parity=N,xmit=PIN_C6,rcv=PIN_C7,bits=8) 
+....................  
+....................  
+....................  
+.................... #include "ds1307paul.c " 
+.................... ////////////////////////////////////////////////////////////////////////////////  
+.................... ///                               DS1307.C                                   ///  
+.................... ///                     Driver for Real Time Clock                           ///  
+.................... ///                                                                          ///  
+.................... /// ds1307_init() - Enable oscillator without clearing the seconds register -///  
+.................... ///                 used when PIC loses power and DS1307 run from 3V BAT     ///  
+.................... ///               - Disable squarewave output                                ///  
+.................... ///                                                                          ///  
+.................... /// ds1307_set_date_time(day,mth,year,dow,hour,min,sec)  Set the date/time   ///  
+.................... ///                                                                          ///  
+.................... /// ds1307_get_date(day,mth,year,dow)               Get the date             ///  
+.................... ///                                                                          ///  
+.................... /// ds1307_get_time(hr,min,sec)                     Get the time             ///  
+.................... ///                                                                          ///  
+.................... //////////////////////////////////////////////////////////////////////////////// 
+....................  
+.................... #use i2c(Master,Fast,sda=PIN_B0,scl=PIN_B1,force_hw) 
+00AA:  BCF    FC6.7
+00AC:  BCF    F9E.3
+00AE:  MOVFF  14,FC9
+00B2:  MOVLW  02
+00B4:  BTFSC  FC6.7
+00B6:  BRA    00C2
+00B8:  BTFSS  F9E.3
+00BA:  BRA    00B8
+00BC:  MOVLW  00
+00BE:  BTFSC  FC5.6
+00C0:  MOVLW  01
+00C2:  MOVWF  01
+00C4:  RETLW  00
+00C6:  BCF    FC6.6
+00C8:  BSF    FC5.3
+00CA:  BTFSC  FC5.3
+00CC:  BRA    00CA
+00CE:  BTFSC  00.0
+00D0:  BCF    FC5.5
+00D2:  BTFSS  00.0
+00D4:  BSF    FC5.5
+00D6:  BSF    FC5.4
+00D8:  BTFSC  FC5.4
+00DA:  BRA    00D8
+00DC:  MOVFF  FC9,01
+00E0:  RETLW  00
+....................  
+.................... BYTE bin2bcd(BYTE binary_value);  
+.................... BYTE bcd2bin(BYTE bcd_value);  
+....................  
+.................... void ds1307_init(void)  
+.................... { 
+*
+012C:  CLRF   0C
+....................    BYTE seconds = 0; 
+....................     
+....................    i2c_start(); 
+012E:  BSF    FC5.0
+0130:  BTFSC  FC5.0
+0132:  BRA    0130
+....................    i2c_write(0xD0);//WR to RTC 
+0134:  MOVLW  D0
+0136:  MOVWF  14
+0138:  RCALL  00AA
+....................    i2c_write(0x00);//REG 0 
+013A:  CLRF   14
+013C:  RCALL  00AA
+....................    i2c_start(); 
+013E:  BSF    FC5.1
+0140:  BTFSC  FC5.1
+0142:  BRA    0140
+....................    i2c_write(0xD1);//RD from RTC 
+0144:  MOVLW  D1
+0146:  MOVWF  14
+0148:  RCALL  00AA
+....................    seconds = bcd2bin(i2c_read(0));//Read current "seconds" in DS1307 
+014A:  CLRF   00
+014C:  RCALL  00C6
+014E:  MOVFF  01,0D
+0152:  MOVFF  01,11
+0156:  RCALL  00E2
+0158:  MOVFF  01,0C
+....................    i2c_stop(); 
+015C:  BSF    FC5.2
+015E:  BTFSC  FC5.2
+0160:  BRA    015E
+....................    seconds &= 0x7F; 
+0162:  BCF    0C.7
+....................    delay_us(3); 
+0164:  MOVLW  04
+0166:  MOVWF  00
+0168:  DECFSZ 00,F
+016A:  BRA    0168
+016C:  BRA    016E
+....................    i2c_start(); 
+016E:  BSF    FC5.0
+0170:  BTFSC  FC5.0
+0172:  BRA    0170
+....................    i2c_write(0xD0);//WR to RTC 
+0174:  MOVLW  D0
+0176:  MOVWF  14
+0178:  RCALL  00AA
+....................    i2c_write(0x00);//REG 0 
+017A:  CLRF   14
+017C:  RCALL  00AA
+....................    i2c_write(bin2bcd(seconds));//Start oscillator with current "seconds value 
+017E:  MOVFF  0C,13
+0182:  RCALL  0108
+0184:  MOVFF  01,0D
+0188:  MOVFF  01,14
+018C:  RCALL  00AA
+....................    i2c_start(); 
+018E:  BSF    FC5.1
+0190:  BTFSC  FC5.1
+0192:  BRA    0190
+....................    i2c_write(0xD0);//WR to RTC 
+0194:  MOVLW  D0
+0196:  MOVWF  14
+0198:  RCALL  00AA
+....................    i2c_write(0x07);//Control register 
+019A:  MOVLW  07
+019C:  MOVWF  14
+019E:  RCALL  00AA
+....................    i2c_write(0x80);//Disable squarewave output pin 
+01A0:  MOVLW  80
+01A2:  MOVWF  14
+01A4:  RCALL  00AA
+....................    i2c_stop(); 
+01A6:  BSF    FC5.2
+01A8:  BTFSC  FC5.2
+01AA:  BRA    01A8
+.................... } 
+01AC:  GOTO   03F2 (RETURN)
+.................... void ds1307_set_date_time(BYTE day, BYTE mth, BYTE year, BYTE dow, BYTE hr, BYTE min, BYTE sec)  
+.................... { 
+....................    sec &= 0x7F; 
+01B0:  BCF    12.7
+....................    hr &= 0x3F; 
+01B2:  MOVLW  3F
+01B4:  ANDWF  10,F
+....................     
+....................    i2c_start(); 
+01B6:  BSF    FC5.0
+01B8:  BTFSC  FC5.0
+01BA:  BRA    01B8
+....................    i2c_write(0xD0);//I2C write address 
+01BC:  MOVLW  D0
+01BE:  MOVWF  14
+01C0:  RCALL  00AA
+....................    i2c_write(0x00);//Start at REG 0-Seconds 
+01C2:  CLRF   14
+01C4:  RCALL  00AA
+....................    i2c_write(bin2bcd(sec));//REG 0 
+01C6:  MOVFF  12,13
+01CA:  RCALL  0108
+01CC:  MOVFF  01,13
+01D0:  MOVFF  01,14
+01D4:  RCALL  00AA
+....................    i2c_write(bin2bcd(min));//REG 1 
+01D6:  MOVFF  11,13
+01DA:  RCALL  0108
+01DC:  MOVFF  01,13
+01E0:  MOVFF  01,14
+01E4:  RCALL  00AA
+....................    i2c_write(bin2bcd(hr));//REG 2 
+01E6:  MOVFF  10,13
+01EA:  RCALL  0108
+01EC:  MOVFF  01,13
+01F0:  MOVFF  01,14
+01F4:  RCALL  00AA
+....................    i2c_write(bin2bcd(dow));//REG 3 
+01F6:  MOVFF  0F,13
+01FA:  RCALL  0108
+01FC:  MOVFF  01,13
+0200:  MOVFF  01,14
+0204:  RCALL  00AA
+....................    i2c_write(bin2bcd(day));//REG 4 
+0206:  MOVFF  0C,13
+020A:  RCALL  0108
+020C:  MOVFF  01,13
+0210:  MOVFF  01,14
+0214:  RCALL  00AA
+....................    i2c_write(bin2bcd(mth));//REG 5 
+0216:  MOVFF  0D,13
+021A:  RCALL  0108
+021C:  MOVFF  01,13
+0220:  MOVFF  01,14
+0224:  RCALL  00AA
+....................    i2c_write(bin2bcd(year));//REG 6 
+0226:  MOVFF  0E,13
+022A:  RCALL  0108
+022C:  MOVFF  01,13
+0230:  MOVFF  01,14
+0234:  RCALL  00AA
+....................    i2c_write(0x80);//REG 7-Disable squarewave output pin 
+0236:  MOVLW  80
+0238:  MOVWF  14
+023A:  RCALL  00AA
+....................    i2c_stop(); 
+023C:  BSF    FC5.2
+023E:  BTFSC  FC5.2
+0240:  BRA    023E
+.................... } 
+0242:  GOTO   0410 (RETURN)
+.................... void ds1307_get_date(BYTE &day, BYTE &mth, BYTE &year, BYTE &dow)  
+.................... { 
+....................    i2c_start(); 
+*
+041E:  BSF    FC5.0
+0420:  BTFSC  FC5.0
+0422:  BRA    0420
+....................    i2c_write(0xD0); 
+0424:  MOVLW  D0
+0426:  MOVWF  14
+0428:  RCALL  00AA
+....................    i2c_write(0x03);//Start at REG 3-Day of week 
+042A:  MOVLW  03
+042C:  MOVWF  14
+042E:  RCALL  00AA
+....................    i2c_start(); 
+0430:  BSF    FC5.1
+0432:  BTFSC  FC5.1
+0434:  BRA    0432
+....................    i2c_write(0xD1); 
+0436:  MOVLW  D1
+0438:  MOVWF  14
+043A:  RCALL  00AA
+....................    dow = bcd2bin(i2c_read()&0x7f);//REG 3 
+043C:  MOVLW  01
+043E:  MOVWF  00
+0440:  RCALL  00C6
+0442:  MOVF   01,W
+0444:  ANDLW  7F
+0446:  MOVWF  0C
+0448:  MOVWF  11
+044A:  RCALL  00E2
+044C:  MOVFF  01,0B
+....................    day = bcd2bin(i2c_read()&0x3f);//REG 4 
+0450:  MOVLW  01
+0452:  MOVWF  00
+0454:  RCALL  00C6
+0456:  MOVF   01,W
+0458:  ANDLW  3F
+045A:  MOVWF  0C
+045C:  MOVWF  11
+045E:  RCALL  00E2
+0460:  MOVFF  01,08
+....................    mth = bcd2bin(i2c_read()&0x1f);//REG 5 
+0464:  MOVLW  01
+0466:  MOVWF  00
+0468:  RCALL  00C6
+046A:  MOVF   01,W
+046C:  ANDLW  1F
+046E:  MOVWF  0C
+0470:  MOVWF  11
+0472:  RCALL  00E2
+0474:  MOVFF  01,09
+....................    year = bcd2bin(i2c_read(0));//REG 6 
+0478:  CLRF   00
+047A:  RCALL  00C6
+047C:  MOVFF  01,0C
+0480:  MOVFF  01,11
+0484:  RCALL  00E2
+0486:  MOVFF  01,0A
+....................    i2c_stop(); 
+048A:  BSF    FC5.2
+048C:  BTFSC  FC5.2
+048E:  BRA    048C
+.................... } 
+.................... void ds1307_get_time(BYTE &hr, BYTE &min, BYTE &sec)  
+.................... { 
+....................    i2c_start(); 
+0490:  BSF    FC5.0
+0492:  BTFSC  FC5.0
+0494:  BRA    0492
+....................    i2c_write(0xD0); 
+0496:  MOVLW  D0
+0498:  MOVWF  14
+049A:  RCALL  00AA
+....................    i2c_write(0x00);//Start at REG 0-Seconds 
+049C:  CLRF   14
+049E:  RCALL  00AA
+....................    i2c_start(); 
+04A0:  BSF    FC5.1
+04A2:  BTFSC  FC5.1
+04A4:  BRA    04A2
+....................    i2c_write(0xD1); 
+04A6:  MOVLW  D1
+04A8:  MOVWF  14
+04AA:  RCALL  00AA
+....................    sec = bcd2bin(i2c_read()&0x7f); 
+04AC:  MOVLW  01
+04AE:  MOVWF  00
+04B0:  RCALL  00C6
+04B2:  MOVF   01,W
+04B4:  ANDLW  7F
+04B6:  MOVWF  0C
+04B8:  MOVWF  11
+04BA:  RCALL  00E2
+04BC:  MOVFF  01,05
+....................    min = bcd2bin(i2c_read()&0x7f); 
+04C0:  MOVLW  01
+04C2:  MOVWF  00
+04C4:  RCALL  00C6
+04C6:  MOVF   01,W
+04C8:  ANDLW  7F
+04CA:  MOVWF  0C
+04CC:  MOVWF  11
+04CE:  RCALL  00E2
+04D0:  MOVFF  01,06
+....................    hr = bcd2bin(i2c_read(0)&0x3f); 
+04D4:  CLRF   00
+04D6:  RCALL  00C6
+04D8:  MOVF   01,W
+04DA:  ANDLW  3F
+04DC:  MOVWF  0C
+04DE:  MOVWF  11
+04E0:  RCALL  00E2
+04E2:  MOVFF  01,07
+....................    i2c_stop(); 
+04E6:  BSF    FC5.2
+04E8:  BTFSC  FC5.2
+04EA:  BRA    04E8
+.................... } 
+.................... BYTE bin2bcd(BYTE binary_value)  
+.................... { 
+....................    BYTE temp; 
+....................    BYTE retval; 
+....................     
+....................    temp = binary_value; 
+*
+0108:  MOVFF  13,14
+....................    retval = 0; 
+010C:  CLRF   15
+....................     
+....................    while(TRUE) 
+....................    { 
+....................       //Get the tens digit by doing multiple subtraction 
+....................       //of 10 from the binary value. 
+....................       if(temp >= 10) 
+010E:  MOVF   14,W
+0110:  SUBLW  09
+0112:  BC    011E
+....................       { 
+....................          temp -= 10; 
+0114:  MOVLW  0A
+0116:  SUBWF  14,F
+....................          retval += 0x10; 
+0118:  MOVLW  10
+011A:  ADDWF  15,F
+....................       } 
+....................       else   //Get the ones digit by adding the remainder. 
+011C:  BRA    0124
+....................       { 
+....................          retval += temp; 
+011E:  MOVF   14,W
+0120:  ADDWF  15,F
+....................          break; 
+0122:  BRA    0126
+....................       } 
+....................    } 
+0124:  BRA    010E
+....................    return(retval); 
+0126:  MOVFF  15,01
+.................... } 
+012A:  RETLW  00
+.................... // Input range - 00 to 99.  
+.................... BYTE bcd2bin(BYTE bcd_value)  
+.................... { 
+....................    BYTE temp; 
+....................     
+....................    temp = bcd_value;//Shifting upper digit right by 1 is same as multiplying by 8. 
+*
+00E2:  MOVFF  11,12
+....................    temp >>= 1; 
+00E6:  BCF    FD8.0
+00E8:  RRCF   12,F
+....................    temp &= 0x78;//Isolate the bits for the upper digit. 
+00EA:  MOVLW  78
+00EC:  ANDWF  12,F
+....................     
+....................    return(temp + (temp >> 2) + (bcd_value & 0x0f));//Now return:(Tens * 8) + (Tens * 2) + Ones 
+00EE:  RRCF   12,W
+00F0:  MOVWF  00
+00F2:  RRCF   00,F
+00F4:  MOVLW  3F
+00F6:  ANDWF  00,F
+00F8:  MOVF   00,W
+00FA:  ADDWF  12,W
+00FC:  MOVWF  13
+00FE:  MOVF   11,W
+0100:  ANDLW  0F
+0102:  ADDWF  13,W
+0104:  MOVWF  01
+.................... } 
+0106:  RETLW  00
+....................  
+....................  
+.................... void main() 
+.................... { 
+*
+035E:  CLRF   FF8
+0360:  BCF    FD0.7
+0362:  CLRF   FEA
+0364:  CLRF   FE9
+0366:  BSF    FB8.3
+0368:  MOVLW  08
+036A:  MOVWF  FAF
+036C:  MOVLW  02
+036E:  MOVWF  FB0
+0370:  MOVLW  A6
+0372:  MOVWF  FAC
+0374:  MOVLW  90
+0376:  MOVWF  FAB
+0378:  BSF    F93.1
+037A:  BSF    F93.0
+037C:  MOVLW  0C
+037E:  MOVWF  FC8
+0380:  MOVLW  28
+0382:  MOVWF  FC6
+0384:  BCF    FC7.7
+0386:  BCF    FC7.6
+0388:  MOVF   FC1,W
+038A:  ANDLW  C0
+038C:  IORLW  0F
+038E:  MOVWF  FC1
+0390:  MOVLW  07
+0392:  MOVWF  FB4
+....................   BYTE sec;  
+....................   BYTE min;  
+....................   BYTE hrs;  
+....................   BYTE day;  
+....................   BYTE month;  
+....................   BYTE yr;  
+....................   BYTE dow; 
+....................  
+....................    setup_adc_ports(NO_ANALOGS|VSS_VDD); 
+0394:  MOVF   FC1,W
+0396:  ANDLW  C0
+0398:  IORLW  0F
+039A:  MOVWF  FC1
+....................    setup_adc(ADC_OFF); 
+039C:  BCF    FC2.0
+....................    setup_psp(PSP_DISABLED); 
+039E:  BCF    F96.4
+....................    setup_wdt(WDT_OFF); 
+03A0:  BCF    FD1.0
+....................    setup_timer_0(RTCC_INTERNAL); 
+03A2:  MOVLW  80
+03A4:  MOVWF  FD5
+....................    setup_timer_1(T1_DISABLED); 
+03A6:  CLRF   FCD
+....................    setup_timer_2(T2_DISABLED,0,1); 
+03A8:  MOVLW  00
+03AA:  MOVWF  FCA
+03AC:  MOVLW  00
+03AE:  MOVWF  FCB
+....................    setup_comparator(NC_NC_NC_NC); 
+03B0:  MOVLW  07
+03B2:  MOVWF  FB4
+03B4:  MOVF   F92,W
+03B6:  MOVWF  F92
+03B8:  MOVLW  10
+03BA:  MOVWF  00
+03BC:  DECFSZ 00,F
+03BE:  BRA    03BC
+03C0:  NOP   
+03C2:  MOVF   FB4,W
+03C4:  BCF    FA1.6
+....................    setup_vref(FALSE); 
+03C6:  CLRF   FB5
+....................     
+....................    printf("%c%c",0xfe,0x01); 
+03C8:  MOVLW  FE
+03CA:  BTFSS  F9E.4
+03CC:  BRA    03CA
+03CE:  MOVWF  FAD
+03D0:  MOVLW  01
+03D2:  BTFSS  F9E.4
+03D4:  BRA    03D2
+03D6:  MOVWF  FAD
+....................    printf("%s","Quelle heure il est?"); 
+03D8:  MOVLW  04
+03DA:  MOVWF  FF6
+03DC:  MOVLW  00
+03DE:  MOVWF  FF7
+03E0:  BRA    0060
+....................    delay_ms(3000); 
+03E2:  MOVLW  0C
+03E4:  MOVWF  0C
+03E6:  MOVLW  FA
+03E8:  MOVWF  0D
+03EA:  RCALL  0084
+03EC:  DECFSZ 0C,F
+03EE:  BRA    03E6
+....................  
+....................    ds1307_init();  
+03F0:  BRA    012C
+....................    
+....................   // Set date for -> 1 avril 2012 Lundi 
+....................   // Set time for -> 15:20:55  
+....................   ds1307_set_date_time(1,4,12,2,15,20,55);  
+03F2:  MOVLW  01
+03F4:  MOVWF  0C
+03F6:  MOVLW  04
+03F8:  MOVWF  0D
+03FA:  MOVLW  0C
+03FC:  MOVWF  0E
+03FE:  MOVLW  02
+0400:  MOVWF  0F
+0402:  MOVLW  0F
+0404:  MOVWF  10
+0406:  MOVLW  14
+0408:  MOVWF  11
+040A:  MOVLW  37
+040C:  MOVWF  12
+040E:  BRA    01B0
+....................    
+....................   while(TRUE)  
+....................   {  
+....................     delay_ms(1000);  
+0410:  MOVLW  04
+0412:  MOVWF  0C
+0414:  MOVLW  FA
+0416:  MOVWF  0D
+0418:  RCALL  0084
+041A:  DECFSZ 0C,F
+041C:  BRA    0414
+....................      
+....................     ds1307_get_date(day,month,yr,dow);  
+....................     ds1307_get_time(hrs,min,sec);  
+....................     printf("%c%c",0xfe,0x01);   
+*
+04EC:  MOVLW  FE
+04EE:  BTFSS  F9E.4
+04F0:  BRA    04EE
+04F2:  MOVWF  FAD
+04F4:  MOVLW  01
+04F6:  BTFSS  F9E.4
+04F8:  BRA    04F6
+04FA:  MOVWF  FAD
+....................     printf("Heure : %02d:%02d:%02d\r\n", hrs,min,sec); 
+04FC:  MOVLW  1A
+04FE:  MOVWF  FF6
+0500:  MOVLW  00
+0502:  MOVWF  FF7
+0504:  MOVLW  08
+0506:  MOVWF  0C
+0508:  RCALL  0246
+050A:  MOVFF  07,0C
+050E:  MOVLW  01
+0510:  MOVWF  0D
+0512:  RCALL  028E
+0514:  MOVLW  3A
+0516:  BTFSS  F9E.4
+0518:  BRA    0516
+051A:  MOVWF  FAD
+051C:  MOVFF  06,0C
+0520:  MOVLW  01
+0522:  MOVWF  0D
+0524:  RCALL  028E
+0526:  MOVLW  3A
+0528:  BTFSS  F9E.4
+052A:  BRA    0528
+052C:  MOVWF  FAD
+052E:  MOVFF  05,0C
+0532:  MOVLW  01
+0534:  MOVWF  0D
+0536:  RCALL  028E
+0538:  MOVLW  0D
+053A:  BTFSS  F9E.4
+053C:  BRA    053A
+053E:  MOVWF  FAD
+0540:  MOVLW  0A
+0542:  BTFSS  F9E.4
+0544:  BRA    0542
+0546:  MOVWF  FAD
+....................     printf("jour  : %02d\r\n", dow); 
+0548:  MOVLW  34
+054A:  MOVWF  FF6
+054C:  MOVLW  00
+054E:  MOVWF  FF7
+0550:  MOVLW  08
+0552:  MOVWF  0C
+0554:  RCALL  0246
+0556:  MOVFF  0B,0C
+055A:  MOVLW  01
+055C:  MOVWF  0D
+055E:  RCALL  028E
+0560:  MOVLW  0D
+0562:  BTFSS  F9E.4
+0564:  BRA    0562
+0566:  MOVWF  FAD
+0568:  MOVLW  0A
+056A:  BTFSS  F9E.4
+056C:  BRA    056A
+056E:  MOVWF  FAD
+....................     printf("Date  : %02d/%02d/20%02d\r\n",day,month,yr);  
+0570:  MOVLW  44
+0572:  MOVWF  FF6
+0574:  MOVLW  00
+0576:  MOVWF  FF7
+0578:  MOVLW  08
+057A:  MOVWF  0C
+057C:  RCALL  0246
+057E:  MOVFF  08,0C
+0582:  MOVLW  01
+0584:  MOVWF  0D
+0586:  RCALL  028E
+0588:  MOVLW  2F
+058A:  BTFSS  F9E.4
+058C:  BRA    058A
+058E:  MOVWF  FAD
+0590:  MOVFF  09,0C
+0594:  MOVLW  01
+0596:  MOVWF  0D
+0598:  RCALL  028E
+059A:  MOVLW  2F
+059C:  BTFSS  F9E.4
+059E:  BRA    059C
+05A0:  MOVWF  FAD
+05A2:  MOVLW  32
+05A4:  BTFSS  F9E.4
+05A6:  BRA    05A4
+05A8:  MOVWF  FAD
+05AA:  MOVLW  30
+05AC:  BTFSS  F9E.4
+05AE:  BRA    05AC
+05B0:  MOVWF  FAD
+05B2:  MOVFF  0A,0C
+05B6:  MOVLW  01
+05B8:  MOVWF  0D
+05BA:  RCALL  028E
+05BC:  MOVLW  0D
+05BE:  BTFSS  F9E.4
+05C0:  BRA    05BE
+05C2:  MOVWF  FAD
+05C4:  MOVLW  0A
+05C6:  BTFSS  F9E.4
+05C8:  BRA    05C6
+05CA:  MOVWF  FAD
+....................   }  
+05CC:  BRA    0410
+.................... } 
+05CE:  SLEEP 
+
+Configuration Fuses:
+   Word  1: CC3F   IESO FCMEN HS PLL12 CPUDIV4 USBDIV
+   Word  2: 0E3F   BROWNOUT WDT128 NOWDT BORV20 NOPUT VREGEN
+   Word  3: 8700   PBADEN CCP2C1 MCLR LPT1OSC
+   Word  4: 00A5   STVREN NODEBUG LVP NOXINST ICPRT
+   Word  5: C00F   NOPROTECT NOCPD NOCPB
+   Word  6: E00F   NOWRT NOWRTD NOWRTC NOWRTB
+   Word  7: 400F   NOEBTR NOEBTRB

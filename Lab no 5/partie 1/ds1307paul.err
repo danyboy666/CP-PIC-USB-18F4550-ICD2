@@ -1,0 +1,4 @@
+*** Error 100 "ds1307paul.c" Line 17(5,53): USE parameter value is out of range   Not a number: PIN_B0
+*** Error 128 "ds1307paul.c" Line 19(1,49): A #DEVICE required before this line
+*** "ds1307paul.c" Line 19: Error #48: Expecting a (
+      3 Errors,  0 Warnings.
