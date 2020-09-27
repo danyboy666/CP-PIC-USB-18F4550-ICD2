@@ -1,0 +1,256 @@
+CCS PCH C Compiler, Version 4.062, 41466               09-févr.-12 14:51
+
+               Filename: C:\Users\Etudiant\Desktop\243-444-RK\Lab no 1\Partie 2\lab 1_Partie2.lst
+
+               ROM used: 258 bytes (1%)
+                         Largest free fragment is 32510
+               RAM used: 6 (0%) at main() level
+                         7 (0%) worst case
+               Stack:    2 locations
+
+*
+0000:  GOTO   007E
+.................... /////////////////////////////////////////////////////////////////////////////// 
+.................... //            Applications des microcontrolleurs        243-444-RK           // 
+.................... //                            Laboratoire no. 1                              // 
+.................... // Programme no 2: 2 LEDs contrôlées par un boutton poussoir.                // 
+.................... //                                                                           // 
+.................... /////////////////////////////////////////////////////////////////////////////// 
+.................... //                                                                           // 
+.................... // Copyright: Dany Ferron 2012                                               // 
+.................... //                                                                           // 
+.................... /////////////////////////////////////////////////////////////////////////////// 
+....................  
+.................... #include "lab 1_Partie2.h" 
+.................... #include <18F4550.h> 
+.................... //////// Standard Header file for the PIC18F4550 device //////////////// 
+.................... #device PIC18F4550 
+.................... #list 
+....................  
+.................... #device adc=8 
+....................  
+.................... #FUSES NOWDT                 	//No Watch Dog Timer 
+.................... #FUSES WDT128                	//Watch Dog Timer uses 1:128 Postscale 
+.................... #FUSES HS                    	//High speed Osc (> 4mhz) 
+.................... #FUSES NOPROTECT             	//Code not protected from reading 
+.................... #FUSES BROWNOUT              	//Reset when brownout detected 
+.................... #FUSES BORV20                	//Brownout reset at 2.0V 
+.................... #FUSES NOPUT                 	//No Power Up Timer 
+.................... #FUSES NOCPD                 	//No EE protection 
+.................... #FUSES STVREN                	//Stack full/underflow will cause reset 
+.................... #FUSES NODEBUG               	//No Debug mode for ICD 
+.................... #FUSES LVP                   	//Low Voltage Programming on B3(PIC16) or B5(PIC18) 
+.................... #FUSES NOWRT                 	//Program memory not write protected 
+.................... #FUSES NOWRTD                	//Data EEPROM not write protected 
+.................... #FUSES IESO                  	//Internal External Switch Over mode enabled 
+.................... #FUSES FCMEN                 	//Fail-safe clock monitor enabled 
+.................... #FUSES PBADEN                	//PORTB pins are configured as analog input channels on RESET 
+.................... #FUSES NOWRTC                	//configuration not registers write protected 
+.................... #FUSES NOWRTB                	//Boot block not write protected 
+.................... #FUSES NOEBTR                	//Memory not protected from table reads 
+.................... #FUSES NOEBTRB               	//Boot block not protected from table reads 
+.................... #FUSES NOCPB                 	//No Boot Block code protection 
+.................... #FUSES MCLR                  	//Master Clear pin enabled 
+.................... #FUSES LPT1OSC               	//Timer1 configured for low-power operation 
+.................... #FUSES NOXINST               	//Extended set extension and Indexed Addressing mode disabled (Legacy mode) 
+.................... #FUSES PLL12                 	//Divide By 12(48MHz oscillator input) 
+.................... #FUSES CPUDIV4               	//System Clock by 4 
+.................... #FUSES USBDIV                	//USB clock source comes from PLL divide by 2 
+.................... #FUSES VREGEN                	//USB voltage regulator enabled 
+.................... #FUSES ICPRT                 	//ICPRT enabled 
+....................  
+.................... #use delay(clock=20000000) 
+0004:  CLRF   FEA
+0006:  MOVLW  07
+0008:  MOVWF  FE9
+000A:  MOVF   FEF,W
+000C:  BZ    0028
+000E:  MOVLW  06
+0010:  MOVWF  01
+0012:  CLRF   00
+0014:  DECFSZ 00,F
+0016:  BRA    0014
+0018:  DECFSZ 01,F
+001A:  BRA    0012
+001C:  MOVLW  7B
+001E:  MOVWF  00
+0020:  DECFSZ 00,F
+0022:  BRA    0020
+0024:  DECFSZ FEF,F
+0026:  BRA    000E
+0028:  RETLW  00
+.................... #use rs232(baud=9600,parity=N,xmit=PIN_C6,rcv=PIN_C7,bits=8) 
+....................  
+....................  
+....................  
+.................... //Constantes utilisées. 
+.................... #define     LED1         PIN_B0 //Active sur niveau bas. 
+.................... #define     LED2         PIN_B1 //Active sur niveau haut. 
+.................... #define     BUTTON       PIN_B2 //Active sur niveau haut. 
+....................  
+....................    void program_button(); 
+....................    void blinky(); 
+....................     
+.................... void main() 
+.................... { 
+*
+007E:  CLRF   FF8
+0080:  BCF    FD0.7
+0082:  CLRF   FEA
+0084:  CLRF   FE9
+0086:  BSF    FB8.3
+0088:  MOVLW  08
+008A:  MOVWF  FAF
+008C:  MOVLW  02
+008E:  MOVWF  FB0
+0090:  MOVLW  A6
+0092:  MOVWF  FAC
+0094:  MOVLW  90
+0096:  MOVWF  FAB
+0098:  MOVF   FC1,W
+009A:  ANDLW  C0
+009C:  IORLW  0F
+009E:  MOVWF  FC1
+00A0:  MOVLW  07
+00A2:  MOVWF  FB4
+....................    setup_adc_ports (NO_ANALOGS|VSS_VDD); 
+00A4:  MOVF   FC1,W
+00A6:  ANDLW  C0
+00A8:  IORLW  0F
+00AA:  MOVWF  FC1
+....................    setup_adc (ADC_OFF); 
+00AC:  BCF    FC2.0
+....................    setup_psp (PSP_DISABLED); 
+00AE:  BCF    F96.4
+....................    setup_spi (SPI_SS_DISABLED); 
+00B0:  BCF    FC6.5
+00B2:  BCF    F94.7
+00B4:  BSF    F93.0
+00B6:  BCF    F93.1
+00B8:  MOVLW  01
+00BA:  MOVWF  FC6
+00BC:  MOVLW  00
+00BE:  MOVWF  FC7
+....................    setup_wdt (WDT_OFF); 
+00C0:  BCF    FD1.0
+....................    setup_timer_0 (RTCC_INTERNAL); 
+00C2:  MOVLW  80
+00C4:  MOVWF  FD5
+....................    setup_timer_1 (T1_DISABLED); 
+00C6:  CLRF   FCD
+....................    setup_timer_2 (T2_DISABLED, 0, 1); 
+00C8:  MOVLW  00
+00CA:  MOVWF  FCA
+00CC:  MOVLW  00
+00CE:  MOVWF  FCB
+....................    setup_comparator (NC_NC_NC_NC); 
+00D0:  MOVLW  07
+00D2:  MOVWF  FB4
+00D4:  MOVF   F92,W
+00D6:  MOVLW  10
+00D8:  MOVWF  00
+00DA:  DECFSZ 00,F
+00DC:  BRA    00DA
+00DE:  NOP   
+00E0:  MOVF   FB4,W
+00E2:  BCF    FA1.6
+....................    setup_vref (FALSE); 
+00E4:  CLRF   FB5
+....................     
+....................    //Éteindre les deux LEDs. 
+....................    output_high (LED1); 
+00E6:  BCF    F93.0
+00E8:  BSF    F8A.0
+....................    output_low (LED2); 
+00EA:  BCF    F93.1
+00EC:  BCF    F8A.1
+....................     
+....................    while (TRUE) //Boucle infinie. 
+....................    { 
+....................          delay_ms (200); //Pause de vérification. 
+00EE:  MOVLW  C8
+00F0:  MOVWF  07
+00F2:  RCALL  0004
+....................       if (input(BUTTON) == 0)program_button(); //Vérification si le bouton est appuyer. 
+00F4:  BSF    F93.2
+00F6:  BTFSC  F81.2
+00F8:  BRA    00FC
+00FA:  BRA    002A
+....................        
+....................          blinky (); //Appel de la boucle de clignotement. 
+00FC:  BRA    0056
+....................    } //Fin de la boucle infinie. 
+00FE:  BRA    00EE
+.................... } //Fin du programme principal. 
+....................  
+.................... void blinky() //Programme de lignotement des LEDs. 
+.................... { 
+0100:  SLEEP 
+....................    output_low (LED1); //Allumé la LED 1. 
+*
+0056:  BCF    F93.0
+0058:  BCF    F8A.0
+....................    delay_ms (2000); //Pendant 2 secondes. 
+005A:  MOVLW  08
+005C:  MOVWF  06
+005E:  MOVLW  FA
+0060:  MOVWF  07
+0062:  RCALL  0004
+0064:  DECFSZ 06,F
+0066:  BRA    005E
+....................    output_high (LED1); //Éteindre LED 1. 
+0068:  BCF    F93.0
+006A:  BSF    F8A.0
+....................    delay_ms (1000); //Pendant 1 secondes. 
+006C:  MOVLW  04
+006E:  MOVWF  06
+0070:  MOVLW  FA
+0072:  MOVWF  07
+0074:  RCALL  0004
+0076:  DECFSZ 06,F
+0078:  BRA    0070
+.................... } 
+007A:  GOTO   00FE (RETURN)
+....................  
+.................... void program_button() //Programme boutton poussoire. 
+.................... { 
+....................    output_high (LED1); //Éteindre LED 1. 
+*
+002A:  BCF    F93.0
+002C:  BSF    F8A.0
+....................    output_high (LED2); //Allumé la LED 1. 
+002E:  BCF    F93.1
+0030:  BSF    F8A.1
+....................    delay_ms (1000); //Pendant 1 secondes. 
+0032:  MOVLW  04
+0034:  MOVWF  06
+0036:  MOVLW  FA
+0038:  MOVWF  07
+003A:  RCALL  0004
+003C:  DECFSZ 06,F
+003E:  BRA    0036
+....................    output_low (LED2); //Éteindre LED 1. 
+0040:  BCF    F93.1
+0042:  BCF    F8A.1
+....................    delay_ms (2000); //Pendant 2 secondes. 
+0044:  MOVLW  08
+0046:  MOVWF  06
+0048:  MOVLW  FA
+004A:  MOVWF  07
+004C:  RCALL  0004
+004E:  DECFSZ 06,F
+0050:  BRA    0048
+.................... } 
+0052:  GOTO   00FC (RETURN)
+....................  
+....................  
+....................  
+
+Configuration Fuses:
+   Word  1: CC3F   IESO FCMEN HS PLL12 CPUDIV4 USBDIV
+   Word  2: 0E3F   BROWNOUT WDT128 NOWDT BORV20 NOPUT VREGEN
+   Word  3: 8700   PBADEN CCP2C1 MCLR LPT1OSC
+   Word  4: 00A5   STVREN NODEBUG LVP NOXINST ICPRT
+   Word  5: C00F   NOPROTECT NOCPD NOCPB
+   Word  6: E00F   NOWRT NOWRTD NOWRTC NOWRTB
+   Word  7: 400F   NOEBTR NOEBTRB

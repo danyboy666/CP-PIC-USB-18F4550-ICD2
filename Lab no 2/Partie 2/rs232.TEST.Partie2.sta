@@ -1,0 +1,51 @@
+
+ROM used: 624 (2%)
+          624 (2%) including unused fragments
+
+          1 Average locations per line
+          6 Average locations per statement
+
+RAM used: 60 (3%) at main() level
+          64 (3%) worst case
+
+Stack used: 2 worst case (out of 30 total available)
+
+Lines Stmts  %   Files
+----- ----- ---  -----
+   69    33  34  rs232.TEST.Partie2.c
+   37     0   0  rs232.TEST.Partie2.h
+  429     0   0  ..\..\..\..\..\..\PROGRA~1\PICC\devices\18F4550.h
+  180    63  66  ..\..\..\..\..\..\PROGRA~1\PICC\drivers\LCD.c
+----- -----
+  715    96 Total
+
+Page ROM  %  RAM   Vol Diff  Functions:
+---- --- --- ---   --- ----  ----------
+0     40   3   1             @delay_ms1
+0     50   4   3   162  3.8  serial_isr
+0     40   3   2   149  4.7  bgetc
+0    242  19   1   666  4.7  MAIN
+0     48   4   0             @const95
+0     50   4   0             @const97
+
+Program metrics:
+    Functions               3
+    Statements              96
+    Comments                194
+    Volume (V)              1220
+    Difficilty (D)          13.1
+    Effort to implement (E) 16043
+    Time to implement (T)   15 minutes
+    Est Delivered Bugs (B)  0
+    Cyclomatic Complexity   2
+    Maintainability (MI)    78
+
+ Segment     Used  Free
+-----------  ----  ----
+00000-00002     4  0  
+00004-00006     0  4  
+00008-0009C   150  0  
+0009E-07FFE   470  32140  
+
+
+

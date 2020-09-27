@@ -1,0 +1,37 @@
+_RETURN_
+CCP_1
+CCP_1_LOW
+CCP_1_HIGH
+CCP_2
+CCP_2_LOW
+CCP_2_HIGH
+PSP_DATA
+C1OUT
+C2OUT
+temp
+
+Project Directory:
+    C:\Users\Etudiant\Desktop\243-444-RK\Lab no 1\Partie 2\
+
+Project Files:
+    lab 1_Partie2.c
+    lab 1_Partie2.h
+    ..\..\..\..\..\..\PROGRA~1\PICC\devices\18F4550.h
+
+Units:
+    C:\Users\Etudiant\Desktop\243-444-RK\Lab no 1\Partie 2\lab 1_Partie2.c (main)
+
+Compiler Settings:
+    Processor:      PIC18F4550
+    Pointer Size:   16
+    ADC Range:      0-255
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+    Output file:    Relocatable
+
+Output Files:
+    Errors:      lab 1_Partie2.err
+    Ext Symbols: lab 1_Partie2.esym
+    Object:      Programme.pushbutton.HEX
+    Symbols:     lab 1_Partie2.osym

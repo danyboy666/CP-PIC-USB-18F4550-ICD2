@@ -1,0 +1,19 @@
+ÀÄMatrix Keyboard 3B
+   ÃÄMAIN  0/326  Ram=1
+   ³  ÃÄ??0??
+   ³  ÃÄ@const80  0/34  Ram=0
+   ³  ÃÄ@const82  0/40  Ram=0
+   ³  ÃÄ@delay_ms1  0/40  Ram=1
+   ³  ÀÄ@const87  0/40  Ram=0
+   ÀÄEXT2_isr  0/12  Ram=0
+      ÀÄkbd_getc  0/270  Ram=6
+         ÃÄ@goto10046  0/34  Ram=0
+         ÃÄ@const52  0/32  Ram=0
+         ÃÄ@const61  0/30  Ram=0
+         ÃÄ@PRINTF_D_9600_31766_31767  0/210  Ram=6
+         ³  ÃÄ@DIV88  0/40  Ram=3
+         ³  ÀÄ@DIV88  0/40  Ram=3
+         ÃÄ@const69  0/28  Ram=0
+         ÀÄ@PRINTF_U_9600_31766_31767  0/110  Ram=2
+            ÃÄ@DIV88  0/40  Ram=3
+            ÀÄ@DIV88  0/40  Ram=3

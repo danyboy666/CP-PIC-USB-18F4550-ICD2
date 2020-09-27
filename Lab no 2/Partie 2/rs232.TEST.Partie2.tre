@@ -1,0 +1,8 @@
+ÀÄrs232
+   ÃÄMAIN  0/242  Ram=1
+   ³  ÃÄ??0??
+   ³  ÃÄ@const95  0/48  Ram=0
+   ³  ÃÄ@const97  0/50  Ram=0
+   ³  ÃÄ@delay_ms1  0/40  Ram=1
+   ³  ÀÄbgetc  0/40  Ram=2
+   ÀÄserial_isr  0/50  Ram=3

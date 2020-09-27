@@ -1,0 +1,50 @@
+
+ROM used: 666 (2%)
+          666 (2%) including unused fragments
+
+          1 Average locations per line
+          10 Average locations per statement
+
+RAM used: 11 (1%) at main() level
+          15 (1%) worst case
+
+Stack used: 2 worst case (out of 31 total available)
+
+Lines Stmts  %   Files
+----- ----- ---  -----
+   51    26  38  Matrix Keyboard.c
+   37     0   0  Matrix Keyboard.h
+  429     0   0  ..\..\..\..\..\..\PROGRA~1\PICC\devices\18F4550.h
+   81    43  62  CLAVIER16T.c
+----- -----
+  598    69 Total
+
+Page ROM  %  RAM   Vol Diff  Functions:
+---- --- --- ---   --- ----  ----------
+0     40   3   1             @delay_ms1
+0     32   2   0             @const52
+0    194  15   5  5861 10.2  kbd_getc
+0     34   3   0             @goto10042
+0    308  23   2   898  4.8  MAIN
+0     24   2   0             @const69
+0     30   2   0             @const71
+
+Program metrics:
+    Functions               2
+    Statements              69
+    Comments                176
+    Volume (V)              7342
+    Difficilty (D)          14.9
+    Effort to implement (E) 109166
+    Time to implement (T)   1 hours, 41 minutes
+    Est Delivered Bugs (B)  1
+    Cyclomatic Complexity   15
+    Maintainability (MI)    115
+
+ Segment     Used  Free
+-----------  ----  ----
+00000-00002     4  0  
+00004-07FFE   662  32102  
+
+
+

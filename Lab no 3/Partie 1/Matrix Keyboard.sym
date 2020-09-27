@@ -1,0 +1,73 @@
+000     @SCRATCH
+001     @SCRATCH
+001     _RETURN_
+002     @SCRATCH
+003     @SCRATCH
+004     @SCRATCH
+005     kbd_getc.kbd_call_count
+006.0   kbd_getc.kbd_down
+007     kbd_getc.last_key
+008     kbd_getc.col
+009     MAIN.k
+00A     kbd_getc.kchar
+00A     MAIN.@SCRATCH1
+00B     kbd_getc.row
+00B     @delay_ms1.P1
+00C     kbd_getc.@SCRATCH1
+00D     kbd_getc.@SCRATCH2
+00E     kbd_getc.@SCRATCH3
+F81     kbd
+F83     PSP_DATA
+FB4.6   C1OUT
+FB4.7   C2OUT
+FBB-FBC CCP_2
+FBB     CCP_2_LOW
+FBC     CCP_2_HIGH
+FBE     CCP_1_LOW
+FBE-FBF CCP_1
+FBF     CCP_1_HIGH
+FE9-FEA @READ_PROGRAM_MEMORY.P1
+FE9-FEA @WRITE_PROGRAM_MEMORY.P2
+FF6-FF8 @READ_PROGRAM_MEMORY.P1
+FF6-FF8 @WRITE_PROGRAM_MEMORY.P2
+
+ROM Allocation:
+013E  @delay_ms1
+0004  KEYS
+005A  kbd_getc
+011C  @goto10042
+0166  MAIN
+0024  @const69
+003C  @const71
+0166  @cinit
+
+Project Directory:
+    C:\Users\Etudiant\Desktop\243-444-RK\Lab no 3\Partie 1\
+
+Project Files:
+    Matrix Keyboard.c
+    Matrix Keyboard.h
+    ..\..\..\..\..\..\PROGRA~1\PICC\devices\18F4550.h
+    CLAVIER16T.c
+
+Units:
+    C:\Users\Etudiant\Desktop\243-444-RK\Lab no 3\Partie 1\Matrix Keyboard.c (main)
+
+Compiler Settings:
+    Processor:      PIC18F4550
+    Pointer Size:   16
+    ADC Range:      0-255
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+
+Output Files:
+    Errors:      Matrix Keyboard.err
+    Ext Symbols: Matrix Keyboard.esym
+    INHX32:      Matrix Keyboard.hex
+    Symbols:     Matrix Keyboard.sym
+    List:        Matrix Keyboard.lst
+    Debug/COFF:  Matrix Keyboard.cof
+    Project:     Matrix Keyboard.PJT
+    Call Tree:   Matrix Keyboard.tre
+    Statistics:  Matrix Keyboard.sta

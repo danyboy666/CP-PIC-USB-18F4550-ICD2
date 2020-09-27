@@ -1,0 +1,25 @@
+[PROJECT]
+Target=C:\Users\Etudiant\Desktop\243-444-RK\Lab no 3\Partie 2\Matrix Keyboard 3B.hex
+Development_Mode=
+Processor_Text=PIC18F4550
+ToolSuite=CCS
+Processor=0x4550
+[C:\Users\Etudiant\Desktop\243-444-RK\Lab no 3\Partie 2\Matrix Keyboard 3B]
+Type=4
+Path=
+FileList=
+BuildTool=
+OptionString=
+AdditionalOptionString=
+[mru-list]
+1=C:\Users\Etudiant\Desktop\243-444-RK\Lab no 3\Partie 2\Matrix Keyboard 3B.c
+[Windows]
+0=0000 %S 0 0 796 451 3 0
+[Units]
+Link=0
+Count=1
+1=C:\Users\Etudiant\Desktop\243-444-RK\Lab no 3\Partie 2\Matrix Keyboard 3B
+[Opened Files]
+1=C:\Users\Etudiant\Desktop\243-444-RK\Lab no 3\Partie 2\Matrix Keyboard 3B.c
+2=
+3=

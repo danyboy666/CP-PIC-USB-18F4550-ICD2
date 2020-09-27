@@ -1,0 +1,459 @@
+CCS PCH C Compiler, Version 4.062, 41466               09-mars-12 20:28
+
+               Filename: C:\Users\Etudiant\Desktop\243-444-RK\Lab no 3\Partie 1\Matrix Keyboard.lst
+
+               ROM used: 666 bytes (2%)
+                         Largest free fragment is 32102
+               RAM used: 11 (1%) at main() level
+                         15 (1%) worst case
+               Stack:    2 locations
+
+*
+0000:  GOTO   0166
+.................... /////////////////////////////////////////////////////////////////////////////// 
+.................... //            Applications des microcontrolleurs        243-444-RK           // 
+.................... //                            Laboratoire no. 3                              // 
+.................... // Programme no 1: Expérimentation d'un clavier matriciel                    // 
+.................... //                                                                           // 
+.................... /////////////////////////////////////////////////////////////////////////////// 
+.................... //                                                                           // 
+.................... // Copyright: Dany Ferron 2012                                               // 
+.................... //                                                                           // 
+.................... /////////////////////////////////////////////////////////////////////////////// 
+....................  
+.................... #include "Matrix Keyboard.h" 
+.................... #include <18F4550.h> 
+.................... //////// Standard Header file for the PIC18F4550 device //////////////// 
+.................... #device PIC18F4550 
+.................... #list 
+....................  
+.................... #device adc=8 
+....................  
+.................... #FUSES NOWDT                    //No Watch Dog Timer 
+.................... #FUSES WDT128                   //Watch Dog Timer uses 1:128 Postscale 
+.................... #FUSES HS                       //High speed Osc (> 4mhz) 
+.................... #FUSES NOPROTECT                //Code not protected from reading 
+.................... #FUSES BROWNOUT                 //Reset when brownout detected 
+.................... #FUSES BORV20                   //Brownout reset at 2.0V 
+.................... #FUSES NOPUT                    //No Power Up Timer 
+.................... #FUSES NOCPD                    //No EE protection 
+.................... #FUSES STVREN                   //Stack full/underflow will cause reset 
+.................... #FUSES NODEBUG                  //No Debug mode for ICD 
+.................... #FUSES LVP                      //Low Voltage Programming on B3(PIC16) or B5(PIC18) 
+.................... #FUSES NOWRT                    //Program memory not write protected 
+.................... #FUSES NOWRTD                   //Data EEPROM not write protected 
+.................... #FUSES IESO                     //Internal External Switch Over mode enabled 
+.................... #FUSES FCMEN                    //Fail-safe clock monitor enabled 
+.................... #FUSES PBADEN                   //PORTB pins are configured as analog input channels on RESET 
+.................... #FUSES NOWRTC                   //configuration not registers write protected 
+.................... #FUSES NOWRTB                   //Boot block not write protected 
+.................... #FUSES NOEBTR                   //Memory not protected from table reads 
+.................... #FUSES NOEBTRB                  //Boot block not protected from table reads 
+.................... #FUSES NOCPB                    //No Boot Block code protection 
+.................... #FUSES MCLR                     //Master Clear pin enabled 
+.................... #FUSES LPT1OSC                  //Timer1 configured for low-power operation 
+.................... #FUSES NOXINST                  //Extended set extension and Indexed Addressing mode disabled (Legacy mode) 
+.................... #FUSES PLL12                    //Divide By 12(48MHz oscillator input) 
+.................... #FUSES CPUDIV4                  //System Clock by 4 
+.................... #FUSES USBDIV                   //USB clock source comes from PLL divide by 2 
+.................... #FUSES VREGEN                   //USB voltage regulator enabled 
+.................... #FUSES ICPRT                    //ICPRT enabled 
+....................  
+.................... #use delay(clock=20000000) 
+013E:  CLRF   FEA
+0140:  MOVLW  0B
+0142:  MOVWF  FE9
+0144:  MOVF   FEF,W
+0146:  BZ    0162
+0148:  MOVLW  06
+014A:  MOVWF  01
+014C:  CLRF   00
+014E:  DECFSZ 00,F
+0150:  BRA    014E
+0152:  DECFSZ 01,F
+0154:  BRA    014C
+0156:  MOVLW  7B
+0158:  MOVWF  00
+015A:  DECFSZ 00,F
+015C:  BRA    015A
+015E:  DECFSZ FEF,F
+0160:  BRA    0148
+0162:  GOTO   025E (RETURN)
+.................... #use rs232(baud=9600,parity=N,xmit=PIN_C6,rcv=PIN_C7,bits=8) 
+....................  
+....................  
+.................... #include "CLAVIER16T.c" 
+.................... #byte kbd = 0xF81                  // adresse du porB= F81h 
+....................  
+.................... // #define constante équivalence elles sont remplacées par leur valeur lors de la compilation 
+.................... #define set_tris_kbd(x) set_tris_b(x) //équivalence entre le deux commande, configuration du port 0=ouput, 1=input 
+....................  
+.................... #define COL0 (1 << 4)           // COL0=décalage à gauche de 4 bit : 0001 0000 
+.................... #define COL1 (1 << 5)           // COL1=décalage à gauche de 4 bit : 0010 0000 
+.................... #define COL2 (1 << 6)           // COL2=décalage à gauche de 4 bit : 0100 0000 
+.................... #define COL3 (1 << 7)           // COL3=décalage à gauche de 4 bit : 1000 0000 
+....................  
+.................... #define ROW0 (1 << 0)           // ROW0=décalage à gauche de 4 bit : 0000 0001 
+.................... #define ROW1 (1 << 1)           // ROW1=décalage à gauche de 4 bit : 0000 0010    
+.................... #define ROW2 (1 << 2)           // ROW2=décalage à gauche de 4 bit : 0000 0100 
+.................... #define ROW3 (1 << 3)           // ROW3=décalage à gauche de 4 bit : 0000 1000 
+....................  
+....................  
+.................... #define ALL_ROWS (ROW0|ROW1|ROW2|ROW3) // All_ROWS=0000 1111 le résultat du OU entre Bits des vars ROWx 
+.................... #define ALL_PINS (ALL_ROWS|COL0|COL1|COL2|COL3)  //ALL_PINS=1111 1111 le résultat du OU entre Bits des vars ROWx et colx 
+....................  
+.................... // Keypad layout: 
+.................... char const KEYS[4][4] ={{'1','4','7','a'},  //  déclaration d'un tableau de  
+....................                         {'2','5','8','0'},  //  caractères de votre clavier 
+....................                         {'3','6','9','b'},  //  ( 4 lignes 4 rangées) 
+....................                         {'*','/','-','+'}}; 
+....................  
+.................... #define KBD_DEBOUNCE_FACTOR 50               // la variable = 50 
+....................                                    
+.................... char kbd_getc( ) {               // retourne le caractère entrée 
+....................    static BYTE kbd_call_count;   //variable=0 déclaré et visible dans la fonction 
+....................    static short int kbd_down; 
+....................    static char last_key; 
+....................    static BYTE col; 
+....................  
+....................    BYTE kchar; 
+....................    BYTE row; 
+....................  
+....................    kchar='\0';                                 //la variable=une chaine nulle  
+*
+005A:  CLRF   0A
+....................     
+....................    if(++kbd_call_count>KBD_DEBOUNCE_FACTOR) {        // si l'incrémentation kbd... est plus grand que 50 
+005C:  INCF   05,F
+005E:  MOVF   05,W
+0060:  SUBLW  32
+0062:  BC    0110
+....................        switch (col) {                                // exécute l'instruction selon la valeur de col 
+0064:  MOVF   08,W
+0066:  ADDLW  FC
+0068:  BC    0090
+006A:  ADDLW  04
+006C:  GOTO   011C
+....................          case 0   : set_tris_kbd(ALL_PINS&~COL0);    // &~ : ET logique avec le complément 1 de COL0 
+0070:  MOVLW  EF
+0072:  MOVWF  F93
+....................                     kbd=~COL0&ALL_PINS;              // Le portB =~ le comp 1 de COL1 ET ALL_PIN 
+0074:  MOVWF  F81
+....................                     break;                           // On sort de sa structure switch 
+0076:  BRA    0090
+....................          case 1   : set_tris_kbd(ALL_PINS&~COL1); 
+0078:  MOVLW  DF
+007A:  MOVWF  F93
+....................                     kbd=~COL1&ALL_PINS; 
+007C:  MOVWF  F81
+....................                     break; 
+007E:  BRA    0090
+....................          case 2   : set_tris_kbd(ALL_PINS&~COL2); 
+0080:  MOVLW  BF
+0082:  MOVWF  F93
+....................                     kbd=~COL2&ALL_PINS; 
+0084:  MOVWF  F81
+....................                     break; 
+0086:  BRA    0090
+....................          case 3   : set_tris_kbd(ALL_PINS&~COL3); 
+0088:  MOVLW  7F
+008A:  MOVWF  F93
+....................                     kbd=~COL3&ALL_PINS; 
+008C:  MOVWF  F81
+....................                     break;            
+008E:  BRA    0090
+....................       }   
+....................       if(kbd_down) {                            // si kbd_down=TRUE 
+0090:  BTFSS  06.0
+0092:  BRA    00A6
+....................          if((kbd & (ALL_ROWS))==(ALL_ROWS)) {   // si (kbd ET logique 0000 1111) égale 0000 1111 
+0094:  MOVF   F81,W
+0096:  ANDLW  0F
+0098:  SUBLW  0F
+009A:  BNZ   00A4
+....................             kbd_down=FALSE; 
+009C:  BCF    06.0
+....................             kchar=last_key;      // sauvegarde de last_key qui est la touche retourné 
+009E:  MOVFF  07,0A
+....................             last_key='\0';       //initialisation de la variable=une chaine nulle 
+00A2:  CLRF   07
+....................          } 
+....................       } 
+....................       else { 
+00A4:  BRA    010E
+....................          if((kbd & (ALL_ROWS))!=(ALL_ROWS)) {  // si (le portb ET logique 0000 1111) n'égale pas  0000 1111  
+00A6:  MOVF   F81,W
+00A8:  ANDLW  0F
+00AA:  SUBLW  0F
+00AC:  BZ    0104
+....................            if((kbd & ROW0)==0)       row=0;   // choix de la rangée 
+00AE:  MOVF   F81,W
+00B0:  ANDLW  01
+00B2:  BNZ   00B8
+00B4:  CLRF   0B
+....................            else if((kbd & ROW1)==0)  row=1; 
+00B6:  BRA    00DA
+00B8:  MOVF   F81,W
+00BA:  ANDLW  02
+00BC:  BNZ   00C4
+00BE:  MOVLW  01
+00C0:  MOVWF  0B
+....................            else if((kbd & ROW2)==0)  row=2; 
+00C2:  BRA    00DA
+00C4:  MOVF   F81,W
+00C6:  ANDLW  04
+00C8:  BNZ   00D0
+00CA:  MOVLW  02
+00CC:  MOVWF  0B
+....................            else if((kbd & ROW3)==0)  row=3; 
+00CE:  BRA    00DA
+00D0:  MOVF   F81,W
+00D2:  ANDLW  08
+00D4:  BNZ   00DA
+00D6:  MOVLW  03
+00D8:  MOVWF  0B
+....................            last_key =KEYS[row][col]; 
+00DA:  MOVF   0B,W
+00DC:  MULLW  04
+00DE:  MOVF   FF3,W
+00E0:  CLRF   0D
+00E2:  MOVWF  0C
+00E4:  CLRF   03
+00E6:  MOVF   08,W
+00E8:  ADDWF  0C,W
+00EA:  MOVWF  01
+00EC:  MOVF   0D,W
+00EE:  ADDWFC 03,F
+00F0:  MOVF   01,W
+00F2:  MOVFF  FF2,0E
+00F6:  BCF    FF2.7
+00F8:  RCALL  0004
+00FA:  BTFSC  0E.7
+00FC:  BSF    FF2.7
+00FE:  MOVWF  07
+....................            kbd_down = TRUE; 
+0100:  BSF    06.0
+....................            } 
+....................            else {                              // choix de la colonne 
+0102:  BRA    010E
+....................                ++col; 
+0104:  INCF   08,F
+....................                if(col==4) 
+0106:  MOVF   08,W
+0108:  SUBLW  04
+010A:  BNZ   010E
+....................                   col=0; 
+010C:  CLRF   08
+....................            } 
+....................       } 
+....................       kbd_call_count=0; 
+010E:  CLRF   05
+....................    } 
+....................    set_tris_kbd(ALL_PINS);     // configuration du portB en I/O selon la variable ALL_PINS    
+0110:  MOVLW  FF
+0112:  MOVWF  F93
+....................    return(kchar); 
+0114:  MOVFF  0A,01
+.................... } 
+0118:  GOTO   020C (RETURN)
+....................  
+....................  
+.................... void main() 
+.................... { 
+*
+0166:  CLRF   FF8
+0168:  BCF    FD0.7
+016A:  CLRF   FEA
+016C:  CLRF   FE9
+016E:  BSF    FB8.3
+0170:  MOVLW  08
+0172:  MOVWF  FAF
+0174:  MOVLW  02
+0176:  MOVWF  FB0
+0178:  MOVLW  A6
+017A:  MOVWF  FAC
+017C:  MOVLW  90
+017E:  MOVWF  FAB
+0180:  MOVF   FC1,W
+0182:  ANDLW  C0
+0184:  IORLW  0F
+0186:  MOVWF  FC1
+0188:  MOVLW  07
+018A:  MOVWF  FB4
+018C:  CLRF   05
+018E:  BCF    06.0
+0190:  CLRF   07
+0192:  CLRF   08
+....................    char k; //Variable locale k. 
+....................     
+....................    setup_adc_ports(NO_ANALOGS|VSS_VDD); 
+0194:  MOVF   FC1,W
+0196:  ANDLW  C0
+0198:  IORLW  0F
+019A:  MOVWF  FC1
+....................    setup_adc(ADC_OFF); 
+019C:  BCF    FC2.0
+....................    setup_psp(PSP_DISABLED); 
+019E:  BCF    F96.4
+....................    setup_spi(SPI_SS_DISABLED); 
+01A0:  BCF    FC6.5
+01A2:  BCF    F94.7
+01A4:  BSF    F93.0
+01A6:  BCF    F93.1
+01A8:  MOVLW  01
+01AA:  MOVWF  FC6
+01AC:  MOVLW  00
+01AE:  MOVWF  FC7
+....................    setup_wdt(WDT_OFF); 
+01B0:  BCF    FD1.0
+....................    setup_timer_0(RTCC_INTERNAL); 
+01B2:  MOVLW  80
+01B4:  MOVWF  FD5
+....................    setup_timer_1(T1_DISABLED); 
+01B6:  CLRF   FCD
+....................    setup_timer_2(T2_DISABLED,0,1); 
+01B8:  MOVLW  00
+01BA:  MOVWF  FCA
+01BC:  MOVLW  00
+01BE:  MOVWF  FCB
+....................    setup_comparator(NC_NC_NC_NC); 
+01C0:  MOVLW  07
+01C2:  MOVWF  FB4
+01C4:  MOVF   F92,W
+01C6:  MOVLW  10
+01C8:  MOVWF  00
+01CA:  DECFSZ 00,F
+01CC:  BRA    01CA
+01CE:  NOP   
+01D0:  MOVF   FB4,W
+01D2:  BCF    FA1.6
+....................    setup_vref(FALSE); 
+01D4:  CLRF   FB5
+....................     
+....................    printf("%c%c",0xfe,0x1); //Positionne le curseur à la position 0x1 et éfface l'écran. 
+01D6:  MOVLW  FE
+01D8:  BTFSS  F9E.4
+01DA:  BRA    01D8
+01DC:  MOVWF  FAD
+01DE:  MOVLW  01
+01E0:  BTFSS  F9E.4
+01E2:  BRA    01E0
+01E4:  MOVWF  FAD
+....................    printf("%c%c",0xfe,0x85); //Positionne le curseur à la position 0x85 et éfface l'écran. 
+01E6:  MOVLW  FE
+01E8:  BTFSS  F9E.4
+01EA:  BRA    01E8
+01EC:  MOVWF  FAD
+01EE:  MOVLW  85
+01F0:  BTFSS  F9E.4
+01F2:  BRA    01F0
+01F4:  MOVWF  FAD
+....................    printf("%s","appuyer"); //Affiche le message. 
+01F6:  CLRF   0A
+01F8:  MOVF   0A,W
+01FA:  RCALL  0024
+01FC:  IORLW  00
+01FE:  BZ    020A
+0200:  INCF   0A,F
+0202:  BTFSS  F9E.4
+0204:  BRA    0202
+0206:  MOVWF  FAD
+0208:  BRA    01F8
+....................     
+....................    do //Faire la boucle tant que... 
+....................    { 
+....................       k=kbd_getc(); 
+020A:  BRA    005A
+020C:  MOVFF  01,09
+....................       if(k!=0) 
+0210:  MOVF   09,F
+0212:  BZ    0296
+....................       { 
+....................          printf("%c%c",0xfe,0x84); //Positionne le curseur à la position 0x84 et éfface l'écran. 
+0214:  MOVLW  FE
+0216:  BTFSS  F9E.4
+0218:  BRA    0216
+021A:  MOVWF  FAD
+021C:  MOVLW  84
+021E:  BTFSS  F9E.4
+0220:  BRA    021E
+0222:  MOVWF  FAD
+....................          printf("touche pesee");  //Affiche le message. 
+0224:  CLRF   0A
+0226:  MOVF   0A,W
+0228:  RCALL  003C
+022A:  INCF   0A,F
+022C:  MOVWF  00
+022E:  MOVF   00,W
+0230:  BTFSS  F9E.4
+0232:  BRA    0230
+0234:  MOVWF  FAD
+0236:  MOVLW  0C
+0238:  SUBWF  0A,W
+023A:  BNZ   0226
+....................          printf("%c%c",0xfe,0xca); //Positionne le curseur à la position 0xca et éfface l'écran. 
+023C:  MOVLW  FE
+023E:  BTFSS  F9E.4
+0240:  BRA    023E
+0242:  MOVWF  FAD
+0244:  MOVLW  CA
+0246:  BTFSS  F9E.4
+0248:  BRA    0246
+024A:  MOVWF  FAD
+....................          printf("%c",k); //Affiche la touche appuyée. 
+024C:  MOVF   09,W
+024E:  BTFSS  F9E.4
+0250:  BRA    024E
+0252:  MOVWF  FAD
+....................          delay_ms(3000); // Delai de 3 secondes. 
+0254:  MOVLW  0C
+0256:  MOVWF  0A
+0258:  MOVLW  FA
+025A:  MOVWF  0B
+025C:  BRA    013E
+025E:  DECFSZ 0A,F
+0260:  BRA    0258
+....................          printf("%c%c",0xfe,0x1); //Positionne le curseur à la position 0x1 et éfface l'écran. 
+0262:  MOVLW  FE
+0264:  BTFSS  F9E.4
+0266:  BRA    0264
+0268:  MOVWF  FAD
+026A:  MOVLW  01
+026C:  BTFSS  F9E.4
+026E:  BRA    026C
+0270:  MOVWF  FAD
+....................          printf("%c%c",0xfe,0x85); //Positionne le curseur à la position 0x85 et éfface l'écran. 
+0272:  MOVLW  FE
+0274:  BTFSS  F9E.4
+0276:  BRA    0274
+0278:  MOVWF  FAD
+027A:  MOVLW  85
+027C:  BTFSS  F9E.4
+027E:  BRA    027C
+0280:  MOVWF  FAD
+....................          printf("%s","appuyer"); //Affiche le message. 
+0282:  CLRF   0A
+0284:  MOVF   0A,W
+0286:  RCALL  0024
+0288:  IORLW  00
+028A:  BZ    0296
+028C:  INCF   0A,F
+028E:  BTFSS  F9E.4
+0290:  BRA    028E
+0292:  MOVWF  FAD
+0294:  BRA    0284
+....................       } 
+....................    } 
+....................    while(true); 
+.................... } 
+0296:  BRA    020A
+0298:  SLEEP 
+
+Configuration Fuses:
+   Word  1: CC3F   IESO FCMEN HS PLL12 CPUDIV4 USBDIV
+   Word  2: 0E3F   BROWNOUT WDT128 NOWDT BORV20 NOPUT VREGEN
+   Word  3: 8700   PBADEN CCP2C1 MCLR LPT1OSC
+   Word  4: 00A5   STVREN NODEBUG LVP NOXINST ICPRT
+   Word  5: C00F   NOPROTECT NOCPD NOCPB
+   Word  6: E00F   NOWRT NOWRTD NOWRTC NOWRTB
+   Word  7: 400F   NOEBTR NOEBTRB

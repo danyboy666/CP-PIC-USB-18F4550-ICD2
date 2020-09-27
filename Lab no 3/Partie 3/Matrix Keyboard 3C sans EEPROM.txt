@@ -1,0 +1,123 @@
+///////////////////////////////////////////////////////////////////////////////
+//            Applications des microcontrolleurs        243-444-RK           //
+//                            Laboratoire no. 3                              //
+// Programme no 3: Expérimentation avec clavier matriciel geré par           //
+//                  interruptions(point boni).                               //
+///////////////////////////////////////////////////////////////////////////////
+//                                                                           //
+// Copyright: Dany Ferron 2012                                               //
+//                                                                           //
+///////////////////////////////////////////////////////////////////////////////
+#include "Matrix Keyboard 3C.h"
+#include "CLAVIER16T c-a interruption.c"
+
+char k;
+int8 addr;
+#define PASSWORD_LENGTH 4
+
+char password[PASSWORD_LENGTH] = {'9','8','7','6'}, 
+     userInput[PASSWORD_LENGTH]={'0','0','0','0'};
+     
+int8 inputCount=0;
+
+#int_EXT2    // utilisation de l'interruption EXT2 cablé sur le portB bit 2
+
+void EXT2_isr(void) 
+   {  
+    k=kbd_getc();
+   }
+
+int1 passwordValid=false;
+int8 j=0;
+
+void main()
+   {
+    setup_adc_ports(NO_ANALOGS|VSS_VDD);
+    setup_adc(ADC_OFF);
+    setup_psp(PSP_DISABLED);
+    setup_spi(SPI_SS_DISABLED);
+    setup_wdt(WDT_OFF);
+    setup_timer_0(RTCC_INTERNAL);
+    setup_timer_1(T1_DISABLED);
+    setup_timer_2(T2_DISABLED,0,1);
+    setup_timer_3(T3_DISABLED|T3_DIV_BY_1);
+    setup_comparator(NC_NC_NC_NC);
+    setup_vref(FALSE);
+    enable_interrupts(int_EXT2);
+    enable_interrupts(GLOBAL);
+    ext_int_edge(2,H_TO_L);//front descendant sur RB2 Interrupt ext 2
+    //Préparation de l'affichage
+    printf("%c%c",0xfe,0x1);
+    printf("%c%c",0xfe,0x81);
+    printf("Entrez votre code");
+    addr=0xc7;
+    do
+     {
+      set_tris_d(0x0f);//Bit0 à bit3 en entrée et bit 4 à bit7 en sortie
+      output_low(pin_D4);
+      output_low(pin_D5);
+      output_low(pin_D6);
+      output_low(pin_D7);
+      if(k!='\0')
+        {
+         printf("%c%c",0xfe,addr);
+         printf("%c",k);
+         delay_ms(300);
+         printf("%c%c",0xfe,addr);
+         printf("*");
+         delay_ms(200);
+         addr++;
+         
+         if(inputCount<PASSWORD_LENGTH)
+           {
+            userInput[inputCount]=k;
+            inputCount++;
+           }
+         k='\0';
+        }
+        
+      else if(inputCount==PASSWORD_LENGTH)
+         {
+          passwordValid=true;
+         
+         for(j=0;j<PASSWORD_LENGTH;j++)
+           {
+            if(userInput[j]!=password[j])
+             {
+              passwordValid=false;
+              printf("%c%c",0xfe,0x1);
+              printf("%c%c",0xfe,0x97);
+              printf("Votre code est");
+              printf("%c%c",0xfe,0xd9);
+              printf("incorrect!");
+              delay_ms(500);
+              printf("%c%c",0xfe,0x1);
+              printf("%c%c",0xfe,0xd5);
+              printf("Veuillez reessayer");
+              printf("%c%c",0xfe,0x1);
+              printf("%c%c",0xfe,0x81);
+              printf("Entrez votre code");
+              addr=0xc7;
+             }
+            userInput[j]='0';
+           }
+         inputCount=0;
+         if(passwordValid==true)
+          {
+           printf("%c%c",0xfe,0x1);
+           printf("%c%c",0xfe,0x97);
+           printf("Votre code est");
+           printf("%c%c",0xfe,0xdb);
+           printf("correct!");
+           delay_ms(1000);
+           printf("%c%c",0xfe,0x1);
+           printf("%c%c",0xfe,0x81);
+           printf("Entrez votre code");
+           addr=0xc7;
+          }
+         }
+      } 
+    while(true);
+   }
+
+      

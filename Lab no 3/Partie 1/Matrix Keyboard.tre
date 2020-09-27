@@ -1,0 +1,10 @@
+ÀÄMatrix Keyboard
+   ÀÄMAIN  0/308  Ram=2
+      ÃÄ??0??
+      ÃÄ@const69  0/24  Ram=0
+      ÃÄkbd_getc  0/194  Ram=5
+      ³  ÃÄ@goto10042  0/34  Ram=0
+      ³  ÀÄ@const52  0/32  Ram=0
+      ÃÄ@const71  0/30  Ram=0
+      ÃÄ@delay_ms1  0/40  Ram=1
+      ÀÄ@const69  0/24  Ram=0

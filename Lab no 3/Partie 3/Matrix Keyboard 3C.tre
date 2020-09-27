@@ -1,0 +1,20 @@
+ÀÄMatrix Keyboard 3C
+   ÃÄMAIN  0/636  Ram=10
+   ³  ÃÄ??0??
+   ³  ÃÄ@PSTRINGC_9600_31766_31767  0/34  Ram=2
+   ³  ÃÄread_from_EEPROM  0/78  Ram=6
+   ³  ÃÄ@delay_ms1  0/38  Ram=1
+   ³  ÃÄ@delay_ms1  0/38  Ram=1
+   ³  ÃÄ@PSTRINGC_9600_31766_31767  0/34  Ram=2
+   ³  ÃÄ@PSTRINGC_9600_31766_31767  0/34  Ram=2
+   ³  ÃÄ@delay_ms1  0/38  Ram=1
+   ³  ÃÄ@PSTRINGC_9600_31766_31767  0/34  Ram=2
+   ³  ÃÄ@PSTRINGC_9600_31766_31767  0/34  Ram=2
+   ³  ÃÄ@PSTRINGC_9600_31766_31767  0/34  Ram=2
+   ³  ÃÄ@PSTRINGC_9600_31766_31767  0/34  Ram=2
+   ³  ÃÄ@delay_ms1  0/38  Ram=1
+   ³  ÀÄ@PSTRINGC_9600_31766_31767  0/34  Ram=2
+   ÀÄEXT2_isr  0/12  Ram=0
+      ÀÄkbd_getc  0/162  Ram=5
+         ÃÄ@goto10058  0/34  Ram=0
+         ÀÄ@const71  0/32  Ram=0

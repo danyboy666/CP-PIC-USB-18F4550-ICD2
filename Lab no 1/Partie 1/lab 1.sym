@@ -1,0 +1,57 @@
+000     @SCRATCH
+001     @SCRATCH
+001     _RETURN_
+002     @SCRATCH
+003     @SCRATCH
+004     @SCRATCH
+006     blinky.@SCRATCH1
+007     @delay_ms1.P1
+F83     PSP_DATA
+FB4.6   C1OUT
+FB4.7   C2OUT
+FBB-FBC CCP_2
+FBB     CCP_2_LOW
+FBC     CCP_2_HIGH
+FBE     CCP_1_LOW
+FBE-FBF CCP_1
+FBF     CCP_1_HIGH
+FE9-FEA @WRITE_PROGRAM_MEMORY.P1
+FE9-FEA @READ_PROGRAM_MEMORY.P2
+FF6-FF8 @READ_PROGRAM_MEMORY.P1
+FF6-FF8 @WRITE_PROGRAM_MEMORY.P2
+
+ROM Allocation:
+0004  @delay_ms1
+0068  main
+002A  blinky
+0068  @cinit
+
+Project Directory:
+    C:\Users\Etudiant\Desktop\243-444-RK\Lab no 1\
+
+Project Files:
+    lab 1.c
+    lab 1.h
+    ..\..\..\..\..\PROGRA~1\PICC\devices\18F4550.h
+
+Units:
+    C:\Users\Etudiant\Desktop\243-444-RK\Lab no 1\lab 1.c (main)
+
+Compiler Settings:
+    Processor:      PIC18F4550
+    Pointer Size:   16
+    ADC Range:      0-255
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+
+Output Files:
+    Errors:      lab 1.err
+    Ext Symbols: lab 1.esym
+    INHX32:      lab 1.hex
+    Symbols:     lab 1.sym
+    List:        lab 1.lst
+    Debug/COFF:  lab 1.cof
+    Project:     lab 1.PJT
+    Call Tree:   lab 1.tre
+    Statistics:  lab 1.sta

@@ -1,0 +1,90 @@
+000     @SCRATCH
+001     @SCRATCH
+001     _RETURN_
+002     @SCRATCH
+003     @SCRATCH
+004     @SCRATCH
+005     @INTERRUPT_AREA
+006     @INTERRUPT_AREA
+007     @INTERRUPT_AREA
+008     @INTERRUPT_AREA
+009     @INTERRUPT_AREA
+00A     @INTERRUPT_AREA
+00B     @INTERRUPT_AREA
+00C     @INTERRUPT_AREA
+00D     @INTERRUPT_AREA
+00E     @INTERRUPT_AREA
+00F     @INTERRUPT_AREA
+010     @INTERRUPT_AREA
+011     @INTERRUPT_AREA
+012     @INTERRUPT_AREA
+013     @INTERRUPT_AREA
+014     @INTERRUPT_AREA
+015     @INTERRUPT_AREA
+016     @INTERRUPT_AREA
+017     @INTERRUPT_AREA
+018-037 buffer
+038     next_in
+039     next_out
+03A     n
+03B     bgetc.c
+03B     MAIN.@SCRATCH1
+03C     @delay_ms1.P1
+03C     bgetc.@SCRATCH1
+03D     serial_isr.t
+03E     serial_isr.@SCRATCH1
+03F     serial_isr.@SCRATCH2
+F83     PSP_DATA
+F83     lcd
+FB4.6   C1OUT
+FB4.7   C2OUT
+FBB     CCP_2_LOW
+FBB-FBC CCP_2
+FBC     CCP_2_HIGH
+FBE-FBF CCP_1
+FBE     CCP_1_LOW
+FBF     CCP_1_HIGH
+FE9-FEA @WRITE_PROGRAM_MEMORY.P1
+FE9-FEA @READ_PROGRAM_MEMORY.P2
+FF6-FF8 @READ_PROGRAM_MEMORY.P1
+FF6-FF8 @WRITE_PROGRAM_MEMORY.P2
+
+ROM Allocation:
+0132  @delay_ms1
+0100  serial_isr
+015A  bgetc
+0182  MAIN
+009E  @const95
+00CE  @const97
+0182  @cinit
+
+Project Directory:
+    C:\Users\Etudiant\Desktop\243-444-RK\Lab no 2\Partie 2\
+
+Project Files:
+    rs232.TEST.Partie2.c
+    rs232.TEST.Partie2.h
+    ..\..\..\..\..\..\PROGRA~1\PICC\devices\18F4550.h
+    ..\..\..\..\..\..\PROGRA~1\PICC\drivers\LCD.c
+
+Units:
+    C:\Users\Etudiant\Desktop\243-444-RK\Lab no 2\Partie 2\rs232.TEST.Partie2.c (main)
+
+Compiler Settings:
+    Processor:      PIC18F4550
+    Pointer Size:   16
+    ADC Range:      0-255
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+
+Output Files:
+    Errors:      rs232.TEST.Partie2.err
+    Ext Symbols: rs232.TEST.Partie2.esym
+    INHX32:      rs232.TEST.Partie2.hex
+    Symbols:     rs232.TEST.Partie2.sym
+    List:        rs232.TEST.Partie2.lst
+    Debug/COFF:  rs232.TEST.Partie2.cof
+    Project:     rs232.TEST.Partie2.PJT
+    Call Tree:   rs232.TEST.Partie2.tre
+    Statistics:  rs232.TEST.Partie2.sta

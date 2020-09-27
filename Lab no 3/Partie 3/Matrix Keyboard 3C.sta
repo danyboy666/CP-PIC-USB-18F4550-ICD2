@@ -1,0 +1,61 @@
+
+ROM used: 1300 (4%)
+          1300 (4%) including unused fragments
+
+          2 Average locations per line
+          13 Average locations per statement
+
+RAM used: 38 (2%) at main() level
+          47 (2%) worst case
+
+Stack used: 4 worst case (out of 31 total available)
+
+Lines Stmts  %   Files
+----- ----- ---  -----
+  210    69  70  Matrix Keyboard 3C.c
+   37     0   0  Matrix Keyboard 3C.h
+  451     0   0  C:\Program Files\PICC\devices\18F4550.h
+   77    29  30  CLAVIER16T c-a interruption.c
+----- -----
+  775    98 Total
+
+Page ROM  %  RAM   Vol Diff  Functions:
+---- --- --- ---   --- ----  ----------
+0     38   1   1             @delay_ms1
+0     32   1   0             @const71
+0    162   6   5  4988 11.0  kbd_getc
+0     34   1   0             @goto10058
+0     12   0   0    24  1.5  EXT2_isr
+0    636  24  10  2635  7.5  MAIN
+0     18   1   0             @const93
+0     34   1   2             @PSTRINGC_9600_31766_31767
+0     16   1   0             @const101
+0     12   0   0             @const103
+0     20   1   0             @const106
+0     18   1   0             @const109
+0     16   1   0             @const112
+0     10   0   0             @const114
+0     18   1   0             @const117
+0     78   3   6   166  4.7  read_from_EEPROM
+
+Program metrics:
+    Functions               4
+    Statements              98
+    Comments                389
+    Volume (V)              9077
+    Difficilty (D)          24.6
+    Effort to implement (E) 223471
+    Time to implement (T)   3 hours, 27 minutes
+    Est Delivered Bugs (B)  1
+    Cyclomatic Complexity   18
+    Maintainability (MI)    99
+
+ Segment     Used  Free
+-----------  ----  ----
+00000-00002     4  0  
+00004-00006     0  4  
+00008-00094   142  0  
+00096-07FFE  1154  31464  
+
+
+

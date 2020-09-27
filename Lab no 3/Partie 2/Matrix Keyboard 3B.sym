@@ -1,0 +1,108 @@
+000     @SCRATCH
+001     @SCRATCH
+001     _RETURN_
+002     @SCRATCH
+003     @SCRATCH
+004     @SCRATCH
+005     @INTERRUPT_AREA
+006     @INTERRUPT_AREA
+007     @INTERRUPT_AREA
+008     @INTERRUPT_AREA
+009     @INTERRUPT_AREA
+00A     @INTERRUPT_AREA
+00B     @INTERRUPT_AREA
+00C     @INTERRUPT_AREA
+00D     @INTERRUPT_AREA
+00E     @INTERRUPT_AREA
+00F     @INTERRUPT_AREA
+010     @INTERRUPT_AREA
+011     @INTERRUPT_AREA
+012     @INTERRUPT_AREA
+013     @INTERRUPT_AREA
+014     @INTERRUPT_AREA
+015     @INTERRUPT_AREA
+016     @INTERRUPT_AREA
+017     @INTERRUPT_AREA
+018     kbd_getc.col
+019     K
+01A     @delay_ms1.P1
+01A     MAIN.@SCRATCH1
+01B     kbd_getc.kchar
+01C     kbd_getc.row
+01D     kbd_getc.@SCRATCH1
+01E     @PRINTF_U_9600_31766_31767.P1
+01E     kbd_getc.@SCRATCH2
+01F     @PRINTF_U_9600_31766_31767.P1
+01F     @PRINTF_D_9600_31766_31767.P2
+01F     kbd_getc.@SCRATCH3
+020     @PRINTF_D_9600_31766_31767.P1
+020     kbd_getc.@SCRATCH4
+021     @PRINTF_D_9600_31766_31767.@SCRATCH1
+022     @PRINTF_D_9600_31766_31767.@SCRATCH2
+023     @PRINTF_D_9600_31766_31767.@SCRATCH3
+024     @PRINTF_D_9600_31766_31767.@SCRATCH4
+025     @DIV88.P1
+026     @DIV88.P1
+027     @DIV88.@SCRATCH1
+F83     kbd
+F83     PSP_DATA
+FB4.6   C1OUT
+FB4.7   C2OUT
+FBB-FBC CCP_2
+FBB     CCP_2_LOW
+FBC     CCP_2_HIGH
+FBE     CCP_1_LOW
+FBE-FBF CCP_1
+FBF     CCP_1_HIGH
+FE9-FEA @READ_PROGRAM_MEMORY.P1
+FE9-FEA @WRITE_PROGRAM_MEMORY.P2
+FF6-FF8 @WRITE_PROGRAM_MEMORY.P1
+FF6-FF8 @READ_PROGRAM_MEMORY.P2
+
+ROM Allocation:
+040E  @delay_ms1
+009E  KEYS
+02D2  kbd_getc
+03E0  @goto10046
+00BE  @const61
+016A  @DIV88
+0192  @PRINTF_D_9600_31766_31767
+00DC  @const69
+0264  @PRINTF_U_9600_31766_31767
+0402  EXT2_isr
+0436  MAIN
+00F8  @const80
+011A  @const82
+0142  @const87
+0436  @cinit
+
+Project Directory:
+    C:\Users\Etudiant\Desktop\243-444-RK\Lab no 3\Partie 2\
+
+Project Files:
+    Matrix Keyboard 3B.c
+    Matrix Keyboard 3B.h
+    ..\..\..\..\..\..\PROGRA~1\PICC\devices\18F4550.h
+    CLAVIER16T c-a interruption.c
+
+Units:
+    C:\Users\Etudiant\Desktop\243-444-RK\Lab no 3\Partie 2\Matrix Keyboard 3B.c (main)
+
+Compiler Settings:
+    Processor:      PIC18F4550
+    Pointer Size:   16
+    ADC Range:      0-255
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+
+Output Files:
+    Errors:      Matrix Keyboard 3B.err
+    Ext Symbols: Matrix Keyboard 3B.esym
+    INHX32:      Matrix Keyboard 3B.hex
+    Symbols:     Matrix Keyboard 3B.sym
+    List:        Matrix Keyboard 3B.lst
+    Debug/COFF:  Matrix Keyboard 3B.cof
+    Project:     Matrix Keyboard 3B.PJT
+    Call Tree:   Matrix Keyboard 3B.tre
+    Statistics:  Matrix Keyboard 3B.sta
