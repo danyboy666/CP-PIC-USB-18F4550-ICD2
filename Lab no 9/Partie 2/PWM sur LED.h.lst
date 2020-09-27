@@ -1,0 +1,315 @@
+CCS PCH C Compiler, Version 4.062, 41466               02-avr.-12 15:04
+
+               Filename: C:\Users\Etudiant\Desktop\Lab 9\Partie 2\PWM sur LED.h.lst
+
+               ROM used: 670 bytes (2%)
+                         Largest free fragment is 32098
+               RAM used: 10 (0%) at main() level
+                         14 (1%) worst case
+               Stack:    2 locations
+
+*
+0000:  GOTO   012A
+.................... /////////////////////////////////////////////////////////////////////////////// 
+.................... //            Applications des microcontrolleurs        243-444-RK           // 
+.................... //                            Laboratoire no. 9                              // 
+.................... //                                                                           // 
+.................... /////////////////////////////////////////////////////////////////////////////// 
+.................... //                                                                           // 
+.................... // Copyright: Dany Ferron 2012                                               // 
+.................... //                                                                           // 
+.................... /////////////////////////////////////////////////////////////////////////////// 
+....................  
+.................... #include "PWM sur LED.h" 
+.................... #include <18F4550.h> 
+.................... //////// Standard Header file for the PIC18F4550 device //////////////// 
+.................... #device PIC18F4550 
+.................... #list 
+....................  
+.................... #device adc=8 
+....................  
+.................... #FUSES NOWDT                    //No Watch Dog Timer 
+.................... #FUSES WDT128                   //Watch Dog Timer uses 1:128 Postscale 
+.................... #FUSES HS                       //High speed Osc (> 4mhz) 
+.................... #FUSES NOPROTECT                //Code not protected from reading 
+.................... #FUSES BROWNOUT                 //Reset when brownout detected 
+.................... #FUSES BORV20                   //Brownout reset at 2.0V 
+.................... #FUSES NOPUT                    //No Power Up Timer 
+.................... #FUSES NOCPD                    //No EE protection 
+.................... #FUSES STVREN                   //Stack full/underflow will cause reset 
+.................... #FUSES NODEBUG                  //No Debug mode for ICD 
+.................... #FUSES LVP                      //Low Voltage Programming on B3(PIC16) or B5(PIC18) 
+.................... #FUSES NOWRT                    //Program memory not write protected 
+.................... #FUSES NOWRTD                   //Data EEPROM not write protected 
+.................... #FUSES IESO                     //Internal External Switch Over mode enabled 
+.................... #FUSES FCMEN                    //Fail-safe clock monitor enabled 
+.................... #FUSES PBADEN                   //PORTB pins are configured as analog input channels on RESET 
+.................... #FUSES NOWRTC                   //configuration not registers write protected 
+.................... #FUSES NOWRTB                   //Boot block not write protected 
+.................... #FUSES NOEBTR                   //Memory not protected from table reads 
+.................... #FUSES NOEBTRB                  //Boot block not protected from table reads 
+.................... #FUSES NOCPB                    //No Boot Block code protection 
+.................... #FUSES MCLR                     //Master Clear pin enabled 
+.................... #FUSES LPT1OSC                  //Timer1 configured for low-power operation 
+.................... #FUSES NOXINST                  //Extended set extension and Indexed Addressing mode disabled (Legacy mode) 
+.................... #FUSES PLL12                    //Divide By 12(48MHz oscillator input) 
+.................... #FUSES CPUDIV4                  //System Clock by 4 
+.................... #FUSES USBDIV                   //USB clock source comes from PLL divide by 2 
+.................... #FUSES VREGEN                   //USB voltage regulator enabled 
+.................... #FUSES ICPRT                    //ICPRT enabled 
+....................  
+.................... #use delay(clock=20000000) 
+0102:  CLRF   FEA
+0104:  MOVLW  08
+0106:  MOVWF  FE9
+0108:  MOVF   FEF,W
+010A:  BZ    0126
+010C:  MOVLW  06
+010E:  MOVWF  01
+0110:  CLRF   00
+0112:  DECFSZ 00,F
+0114:  BRA    0112
+0116:  DECFSZ 01,F
+0118:  BRA    0110
+011A:  MOVLW  7B
+011C:  MOVWF  00
+011E:  DECFSZ 00,F
+0120:  BRA    011E
+0122:  DECFSZ FEF,F
+0124:  BRA    010C
+0126:  GOTO   0294 (RETURN)
+.................... #use rs232(baud=9600,parity=N,xmit=PIN_C6,rcv=PIN_C7,bits=8) 
+....................  
+....................  
+.................... int rapport_cyclique, selection, select_courante; 
+....................  
+.................... void main() 
+.................... { 
+012A:  CLRF   FF8
+012C:  BCF    FD0.7
+012E:  CLRF   FEA
+0130:  CLRF   FE9
+0132:  BSF    FB8.3
+0134:  MOVLW  08
+0136:  MOVWF  FAF
+0138:  MOVLW  02
+013A:  MOVWF  FB0
+013C:  MOVLW  A6
+013E:  MOVWF  FAC
+0140:  MOVLW  90
+0142:  MOVWF  FAB
+0144:  MOVF   FC1,W
+0146:  ANDLW  C0
+0148:  IORLW  0F
+014A:  MOVWF  FC1
+014C:  MOVLW  07
+014E:  MOVWF  FB4
+....................    setup_adc_ports(NO_ANALOGS|VSS_VDD); 
+0150:  MOVF   FC1,W
+0152:  ANDLW  C0
+0154:  IORLW  0F
+0156:  MOVWF  FC1
+....................    setup_adc(ADC_OFF); 
+0158:  BCF    FC2.0
+....................    setup_psp(PSP_DISABLED); 
+015A:  BCF    F96.4
+....................    setup_spi(SPI_SS_DISABLED); 
+015C:  BCF    FC6.5
+015E:  BCF    F94.7
+0160:  BSF    F93.0
+0162:  BCF    F93.1
+0164:  MOVLW  01
+0166:  MOVWF  FC6
+0168:  MOVLW  00
+016A:  MOVWF  FC7
+....................    setup_wdt(WDT_OFF); 
+016C:  BCF    FD1.0
+....................    setup_timer_0(RTCC_INTERNAL); 
+016E:  MOVLW  80
+0170:  MOVWF  FD5
+....................    setup_timer_1(T1_DISABLED); 
+0172:  CLRF   FCD
+....................    setup_timer_2(T2_DIV_BY_16,200,16);              // 97,2 Hz 
+0174:  MOVLW  78
+0176:  IORLW  06
+0178:  MOVWF  FCA
+017A:  MOVLW  C8
+017C:  MOVWF  FCB
+....................    setup_comparator(NC_NC_NC_NC); 
+017E:  MOVLW  07
+0180:  MOVWF  FB4
+0182:  MOVF   F92,W
+0184:  MOVLW  10
+0186:  MOVWF  00
+0188:  DECFSZ 00,F
+018A:  BRA    0188
+018C:  NOP   
+018E:  MOVF   FB4,W
+0190:  BCF    FA1.6
+....................    setup_vref(FALSE); 
+0192:  CLRF   FB5
+....................  
+....................    Port_b_pullups(true); 
+0194:  BCF    FF1.7
+....................    setup_ccp1(CCP_PWM) ; 
+0196:  BCF    F94.2
+0198:  BCF    F8B.2
+019A:  MOVLW  0C
+019C:  MOVWF  FBD
+019E:  CLRF   FB7
+....................    Select_courante=(input_B() & 0x07); 
+01A0:  MOVLW  FF
+01A2:  MOVWF  F93
+01A4:  MOVF   F81,W
+01A6:  ANDLW  07
+01A8:  MOVWF  07
+....................    while(true) 
+....................    { 
+....................       while ((~(input_B()) & 0x7)==select_courante);  
+01AA:  MOVLW  FF
+01AC:  MOVWF  F93
+01AE:  MOVF   F81,W
+01B0:  XORLW  FF
+01B2:  ANDLW  07
+01B4:  SUBWF  07,W
+01B6:  BZ    01AA
+....................       selection =(~(input_B()) & 0x7); 
+01B8:  MOVLW  FF
+01BA:  MOVWF  F93
+01BC:  MOVF   F81,W
+01BE:  XORLW  FF
+01C0:  ANDLW  07
+01C2:  MOVWF  06
+....................       switch(selection) 
+....................       { 
+01C4:  MOVF   06,W
+01C6:  XORLW  01
+01C8:  BZ    01D4
+01CA:  XORLW  03
+01CC:  BZ    01DA
+01CE:  XORLW  06
+01D0:  BZ    01E0
+01D2:  BRA    01E6
+....................          case 0x1: rapport_cyclique = 120;                  // à  44% 
+01D4:  MOVLW  78
+01D6:  MOVWF  05
+....................             break; 
+01D8:  BRA    01E8
+....................          case 0x2: rapport_cyclique = 150;              // à  28% 
+01DA:  MOVLW  96
+01DC:  MOVWF  05
+....................             break; 
+01DE:  BRA    01E8
+....................          case 0x4: rapport_cyclique = 195;              // à   3% 
+01E0:  MOVLW  C3
+01E2:  MOVWF  05
+....................             break; 
+01E4:  BRA    01E8
+....................          default: rapport_cyclique= 0;                    // à 100% 
+01E6:  CLRF   05
+....................       } 
+....................       printf("%c%c",0xfe,0x01); 
+01E8:  MOVLW  FE
+01EA:  BTFSS  F9E.4
+01EC:  BRA    01EA
+01EE:  MOVWF  FAD
+01F0:  MOVLW  01
+01F2:  BTFSS  F9E.4
+01F4:  BRA    01F2
+01F6:  MOVWF  FAD
+....................       printf("sel_courante = %u\r\n",select_courante); 
+01F8:  CLRF   08
+01FA:  MOVF   08,W
+01FC:  RCALL  0004
+01FE:  INCF   08,F
+0200:  MOVWF  00
+0202:  MOVF   00,W
+0204:  BTFSS  F9E.4
+0206:  BRA    0204
+0208:  MOVWF  FAD
+020A:  MOVLW  0F
+020C:  SUBWF  08,W
+020E:  BNZ   01FA
+0210:  MOVFF  07,09
+0214:  MOVLW  1B
+0216:  MOVWF  0A
+0218:  RCALL  0096
+021A:  MOVLW  0D
+021C:  BTFSS  F9E.4
+021E:  BRA    021C
+0220:  MOVWF  FAD
+0222:  MOVLW  0A
+0224:  BTFSS  F9E.4
+0226:  BRA    0224
+0228:  MOVWF  FAD
+....................       printf("selection = %u\r\n",selection); 
+022A:  CLRF   08
+022C:  MOVF   08,W
+022E:  RCALL  0028
+0230:  INCF   08,F
+0232:  MOVWF  00
+0234:  MOVF   00,W
+0236:  BTFSS  F9E.4
+0238:  BRA    0236
+023A:  MOVWF  FAD
+023C:  MOVLW  0C
+023E:  SUBWF  08,W
+0240:  BNZ   022C
+0242:  MOVFF  06,09
+0246:  MOVLW  1B
+0248:  MOVWF  0A
+024A:  RCALL  0096
+024C:  MOVLW  0D
+024E:  BTFSS  F9E.4
+0250:  BRA    024E
+0252:  MOVWF  FAD
+0254:  MOVLW  0A
+0256:  BTFSS  F9E.4
+0258:  BRA    0256
+025A:  MOVWF  FAD
+....................       printf("rap_cyclique = %u\r\n",rapport_cyclique); 
+025C:  CLRF   08
+025E:  MOVF   08,W
+0260:  RCALL  004A
+0262:  INCF   08,F
+0264:  MOVWF  00
+0266:  MOVF   00,W
+0268:  BTFSS  F9E.4
+026A:  BRA    0268
+026C:  MOVWF  FAD
+026E:  MOVLW  0F
+0270:  SUBWF  08,W
+0272:  BNZ   025E
+0274:  MOVFF  05,09
+0278:  MOVLW  1B
+027A:  MOVWF  0A
+027C:  RCALL  0096
+027E:  MOVLW  0D
+0280:  BTFSS  F9E.4
+0282:  BRA    0280
+0284:  MOVWF  FAD
+0286:  MOVLW  0A
+0288:  BTFSS  F9E.4
+028A:  BRA    0288
+028C:  MOVWF  FAD
+....................       delay_ms(100); 
+028E:  MOVLW  64
+0290:  MOVWF  08
+0292:  BRA    0102
+....................       CCP_1 = rapport_cyclique;                         // registre à l'adresse 0xfbe 
+0294:  CLRF   FBF
+0296:  MOVFF  05,FBE
+....................    } 
+029A:  BRA    01AA
+.................... } 
+....................  
+029C:  SLEEP 
+
+Configuration Fuses:
+   Word  1: CC3F   IESO FCMEN HS PLL12 CPUDIV4 USBDIV
+   Word  2: 0E3F   BROWNOUT WDT128 NOWDT BORV20 NOPUT VREGEN
+   Word  3: 8700   PBADEN CCP2C1 MCLR LPT1OSC
+   Word  4: 00A5   STVREN NODEBUG LVP NOXINST ICPRT
+   Word  5: C00F   NOPROTECT NOCPD NOCPB
+   Word  6: E00F   NOWRT NOWRTD NOWRTC NOWRTB
+   Word  7: 400F   NOEBTR NOEBTRB

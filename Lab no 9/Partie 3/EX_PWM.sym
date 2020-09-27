@@ -1,0 +1,62 @@
+000     @SCRATCH
+001     @SCRATCH
+001     _RETURN_
+002     @SCRATCH
+003     @SCRATCH
+004     @SCRATCH
+006     main.selection
+007     main.value
+008     @PRINTF_X_9600_31766_31767.P1
+008     main.@SCRATCH1
+009     @PRINTF_X_9600_31766_31767.P1
+F83     PSP_DATA
+FB4.6   C1OUT
+FB4.7   C2OUT
+FBB     CCP_2_LOW
+FBB-FBC CCP_2
+FBC     CCP_2_HIGH
+FBE-FBF CCP_1
+FBE     CCP_1_LOW
+FBF     CCP_1_HIGH
+FE9-FEA @WRITE_PROGRAM_MEMORY.P1
+FE9-FEA @READ_PROGRAM_MEMORY.P2
+FF6-FF8 @READ_PROGRAM_MEMORY.P1
+FF6-FF8 @WRITE_PROGRAM_MEMORY.P2
+
+ROM Allocation:
+00CC  main
+0004  @const55
+0024  @const56
+0046  @const57
+0066  @const58
+0088  @PRINTF_X_9600_31766_31767
+00CC  @cinit
+
+Project Directory:
+    C:\Users\Etudiant\Desktop\Lab 9\Partie 3\
+
+Project Files:
+    EX_PWM.c
+    ..\..\..\..\..\PROGRA~1\PICC\devices\18f4550.H
+
+Units:
+    C:\Users\Etudiant\Desktop\Lab 9\Partie 3\EX_PWM.c (main)
+
+Compiler Settings:
+    Processor:      PIC18F4550
+    Pointer Size:   16
+    ADC Range:      0-255
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+
+Output Files:
+    Errors:      EX_PWM.err
+    Ext Symbols: EX_PWM.esym
+    INHX32:      EX_PWM.hex
+    Symbols:     EX_PWM.sym
+    List:        EX_PWM.lst
+    Debug/COFF:  EX_PWM.cof
+    Project:     EX_PWM.PJT
+    Call Tree:   EX_PWM.tre
+    Statistics:  EX_PWM.sta

@@ -1,0 +1,46 @@
+
+ROM used: 298 (1%)
+          298 (1%) including unused fragments
+
+          1 Average locations per line
+          19 Average locations per statement
+
+RAM used: 25 (1%) at main() level
+          25 (1%) worst case
+
+Stack used: 1 worst case (out of 30 total available)
+
+Lines Stmts  %   Files
+----- ----- ---  -----
+   39    16 100  exercise onde carré 1khz avec timer2.c
+   37     0   0  exercise onde carré 1khz avec timer2.h
+  429     0   0  ..\..\..\..\..\PROGRA~1\PICC\devices\18F4550.h
+----- -----
+  505    16 Total
+
+Page ROM  %  RAM   Vol Diff  Functions:
+---- --- --- ---   --- ----  ----------
+0     22   4   0    48  1.9  TIMER2_isr
+0    122  20   0   310  2.8  MAIN
+
+Program metrics:
+    Functions               2
+    Statements              16
+    Comments                129
+    Volume (V)              410
+    Difficilty (D)          4.9
+    Effort to implement (E) 2017
+    Time to implement (T)   2 minutes
+    Est Delivered Bugs (B)  0
+    Cyclomatic Complexity   1
+    Maintainability (MI)    103
+
+ Segment     Used  Free
+-----------  ----  ----
+00000-00002     4  0  
+00004-00006     0  4  
+00008-0009C   150  0  
+0009E-07FFE   144  32466  
+
+
+

@@ -1,0 +1,49 @@
+
+ROM used: 670 (2%)
+          670 (2%) including unused fragments
+
+          1 Average locations per line
+          21 Average locations per statement
+
+RAM used: 10 (0%) at main() level
+          14 (1%) worst case
+
+Stack used: 2 worst case (out of 31 total available)
+
+Lines Stmts  %   Files
+----- ----- ---  -----
+   53    32 100  PWM sur LED.h.c
+   37     0   0  PWM sur LED.h
+  429     0   0  ..\..\..\..\..\PROGRA~1\PICC\devices\18F4550.h
+----- -----
+  519    32 Total
+
+Page ROM  %  RAM   Vol Diff  Functions:
+---- --- --- ---   --- ----  ----------
+0     40   3   1             @delay_ms1
+0    372  28   2  1029  7.2  main
+0     36   3   0             @const57
+0     40   3   3             @DIV88
+0    108   8   2             @PRINTF_U_9600_31766_31767
+0     34   3   0             @const64
+0     36   3   0             @const65
+
+Program metrics:
+    Functions               1
+    Statements              32
+    Comments                134
+    Volume (V)              1045
+    Difficilty (D)          6.6
+    Effort to implement (E) 6898
+    Time to implement (T)   6 minutes
+    Est Delivered Bugs (B)  0
+    Cyclomatic Complexity   4
+    Maintainability (MI)    38
+
+ Segment     Used  Free
+-----------  ----  ----
+00000-00002     4  0  
+00004-07FFE   666  32098  
+
+
+

@@ -1,0 +1,251 @@
+CCS PCH C Compiler, Version 4.062, 41466               02-avr.-12 15:06
+
+               Filename: C:\Users\Etudiant\Desktop\Lab 9\Partie 3\EX_PWM.lst
+
+               ROM used: 508 bytes (2%)
+                         Largest free fragment is 32260
+               RAM used: 8 (0%) at main() level
+                         9 (0%) worst case
+               Stack:    1 locations
+
+*
+0000:  GOTO   00CC
+.................... //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+.................... ////                           EX_PWM.C                                                                   //// 
+.................... ////                                                                                                                 //// 
+.................... ////   Ce programme montre comment utiliser les fonctions                   //// 
+.................... ////   intégrées dans le PIC PWM. Le programme prend une entrée       //// 
+.................... ////   analogique et utilise la valeur numérique pour définir                    //// 
+.................... ////   le cycle de travail. La fréquence  est définie par                              //// 
+.................... ////   l'utilisateur sur le port RS-232.                                                          //// 
+.................... ////                                                                                                                 //// 
+.................... ////    Configurer la carte comme suit:                                                       //// 
+.................... ////       Connectez un l'OSCILLOSCOPE à la broche C2                         //// 
+.................... ////        Connectez la broche A0 à la sortie du POTENTIOMÈTRE        //// 
+.................... ////                                                                                                                //// 
+.................... /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+.................... ////        (C) Copyright 1996,2007 Custom Computer Services               //// 
+.................... //// This source code may only be used by licensed users of the CCS //// 
+.................... //// C compiler.  This source code may only be distributed to other       //// 
+.................... //// licensed users of the CCS C compiler.  No other use,                      //// 
+.................... //// reproduction or distribution is permitted without written                 //// 
+.................... //// permission.  Derivative programs created using this software       //// 
+.................... //// in object code form are not restricted in any way.                            //// 
+.................... //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+.................... #include <18f4550.H> 
+.................... //////// Standard Header file for the PIC18F4550 device //////////////// 
+.................... #device PIC18F4550 
+.................... #list 
+....................  
+.................... #fuses HS,NOWDT,NOPROTECT,NOLVP 
+.................... #use delay(clock=20000000) 
+.................... #use rs232(baud=9600, xmit=PIN_C6, rcv=PIN_C7, BRGH1OK) 
+....................  
+.................... void main(void) 
+.................... { 
+00CC:  CLRF   FF8
+00CE:  BCF    FD0.7
+00D0:  CLRF   FEA
+00D2:  CLRF   FE9
+00D4:  BSF    FB8.3
+00D6:  MOVLW  08
+00D8:  MOVWF  FAF
+00DA:  MOVLW  02
+00DC:  MOVWF  FB0
+00DE:  MOVLW  A6
+00E0:  MOVWF  FAC
+00E2:  MOVLW  90
+00E4:  MOVWF  FAB
+00E6:  MOVF   FC1,W
+00E8:  ANDLW  C0
+00EA:  IORLW  0F
+00EC:  MOVWF  FC1
+00EE:  MOVLW  07
+00F0:  MOVWF  FB4
+....................    char selection; 
+....................    unsigned int8 value; 
+....................  
+....................    printf("\r\nFrequency:\r\n"); 
+00F2:  CLRF   08
+00F4:  MOVF   08,W
+00F6:  RCALL  0004
+00F8:  INCF   08,F
+00FA:  MOVWF  00
+00FC:  MOVF   00,W
+00FE:  BTFSS  F9E.4
+0100:  BRA    00FE
+0102:  MOVWF  FAD
+0104:  MOVLW  0E
+0106:  SUBWF  08,W
+0108:  BNZ   00F4
+....................    printf("    1) 20.8 khz\r\n"); 
+010A:  CLRF   08
+010C:  MOVF   08,W
+010E:  RCALL  0024
+0110:  INCF   08,F
+0112:  MOVWF  00
+0114:  MOVF   00,W
+0116:  BTFSS  F9E.4
+0118:  BRA    0116
+011A:  MOVWF  FAD
+011C:  MOVLW  11
+011E:  SUBWF  08,W
+0120:  BNZ   010C
+....................    printf("    2) 5 khz\r\n"); 
+0122:  CLRF   08
+0124:  MOVF   08,W
+0126:  RCALL  0046
+0128:  INCF   08,F
+012A:  MOVWF  00
+012C:  MOVF   00,W
+012E:  BTFSS  F9E.4
+0130:  BRA    012E
+0132:  MOVWF  FAD
+0134:  MOVLW  0E
+0136:  SUBWF  08,W
+0138:  BNZ   0124
+....................    printf("    3) 1.2 khz\r\n"); 
+013A:  CLRF   08
+013C:  MOVF   08,W
+013E:  RCALL  0066
+0140:  INCF   08,F
+0142:  MOVWF  00
+0144:  MOVF   00,W
+0146:  BTFSS  F9E.4
+0148:  BRA    0146
+014A:  MOVWF  FAD
+014C:  MOVLW  10
+014E:  SUBWF  08,W
+0150:  BNZ   013C
+....................  
+....................    do { 
+....................      selection=getc(); 
+0152:  BTFSS  F9E.5
+0154:  BRA    0152
+0156:  MOVFF  FAE,06
+....................    } while((selection<'1')||(selection>'3')); 
+015A:  MOVF   06,W
+015C:  SUBLW  30
+015E:  BC    0152
+0160:  MOVF   06,W
+0162:  SUBLW  33
+0164:  BNC   0152
+....................  
+....................    setup_ccp1(CCP_PWM);   // Configure CCP1 as a PWM 
+0166:  BCF    F94.2
+0168:  BCF    F8B.2
+016A:  MOVLW  0C
+016C:  MOVWF  FBD
+016E:  CLRF   FB7
+....................  
+....................           //   The cycle time will be (1/clock)*4*t2div*(period+1)*post_diviseur 
+....................           //   In this program clock=20000000 and period=15, 63, ou 129 (below) 
+....................           //   For the three possible selections the cycle time is: 
+....................           //     (1/20000000)*4*16*(15+1)*1 =  48.0 us or 20.8 khz 
+....................           //     (1/20000000)*4*16*(63+1)*1 = 200.6 us or 5.0 khz 
+....................           //     (1/20000000)*4*16*(129+1)*2= 825.6 us or 1.2 khz 
+....................  
+....................    switch(selection) { 
+0170:  MOVF   06,W
+0172:  XORLW  31
+0174:  BZ    0180
+0176:  XORLW  03
+0178:  BZ    018C
+017A:  XORLW  01
+017C:  BZ    0198
+017E:  BRA    01A4
+....................      case '1' : setup_timer_2(T2_DIV_BY_16, 15, 1); 
+0180:  MOVLW  00
+0182:  IORLW  06
+0184:  MOVWF  FCA
+0186:  MOVLW  0F
+0188:  MOVWF  FCB
+....................                 break; 
+018A:  BRA    01A4
+....................      case '2' : setup_timer_2(T2_DIV_BY_16, 63, 1); 
+018C:  MOVLW  00
+018E:  IORLW  06
+0190:  MOVWF  FCA
+0192:  MOVLW  3F
+0194:  MOVWF  FCB
+....................                 break; 
+0196:  BRA    01A4
+....................      case '3' : setup_timer_2(T2_DIV_BY_16, 129, 2); 
+0198:  MOVLW  08
+019A:  IORLW  06
+019C:  MOVWF  FCA
+019E:  MOVLW  81
+01A0:  MOVWF  FCB
+....................                 break; 
+01A2:  BRA    01A4
+....................    } 
+....................  
+....................   setup_port_a(ALL_ANALOG); 
+01A4:  MOVF   FC1,W
+01A6:  ANDLW  C0
+01A8:  MOVWF  FC1
+....................   setup_adc(adc_clock_internal); 
+01AA:  BSF    FC0.0
+01AC:  BSF    FC0.1
+01AE:  BSF    FC0.2
+01B0:  BCF    FC0.7
+01B2:  BSF    FC2.0
+....................   set_adc_channel( 0 ); 
+01B4:  MOVLW  00
+01B6:  MOVWF  01
+01B8:  MOVF   FC2,W
+01BA:  ANDLW  C3
+01BC:  IORWF  01,W
+01BE:  MOVWF  FC2
+....................   printf("%c\r\n",selection); 
+01C0:  MOVF   06,W
+01C2:  BTFSS  F9E.4
+01C4:  BRA    01C2
+01C6:  MOVWF  FAD
+01C8:  MOVLW  0D
+01CA:  BTFSS  F9E.4
+01CC:  BRA    01CA
+01CE:  MOVWF  FAD
+01D0:  MOVLW  0A
+01D2:  BTFSS  F9E.4
+01D4:  BRA    01D2
+01D6:  MOVWF  FAD
+....................  
+....................   while( TRUE ) { 
+....................     value=read_adc(); 
+01D8:  BSF    FC2.1
+01DA:  BTFSC  FC2.1
+01DC:  BRA    01DA
+01DE:  MOVFF  FC4,07
+....................  
+....................     printf("%2X\r",value); 
+01E2:  MOVFF  07,08
+01E6:  MOVLW  37
+01E8:  MOVWF  09
+01EA:  BRA    0088
+01EC:  MOVLW  0D
+01EE:  BTFSS  F9E.4
+01F0:  BRA    01EE
+01F2:  MOVWF  FAD
+....................  
+....................     set_pwm1_duty(value);          // This sets the time the pulse is high each cycle. 
+01F4:  MOVFF  07,FBE
+....................                                    // We use the A/D input to make a easy demo. the high time will be : 
+....................                                    // if value is LONG INT : value*(1/clock)*t2div  
+....................                                    // if value is INT: value*4*(1/clock)*t2div  for example a value of 30 and t2div of 1 
+....................                                    // the high time is 6 us 
+....................                                    // WARNING: A value too high or low will prevent the output from changing. 
+....................   } 
+01F8:  BRA    01D8
+.................... } 
+....................   
+01FA:  SLEEP 
+
+Configuration Fuses:
+   Word  1: 0C20   NOIESO NOFCMEN HS PLL1 CPUDIV1 USBDIV
+   Word  2: 1E1E   BROWNOUT NOWDT BORV20 PUT WDT32768 NOVREGEN RESERVED
+   Word  3: 8300   PBADEN CCP2C1 MCLR NOLPT1OSC RESERVED
+   Word  4: 0081   STVREN NODEBUG NOLVP NOXINST NOICPRT RESERVED
+   Word  5: C00F   NOPROTECT NOCPD NOCPB
+   Word  6: E00F   NOWRT NOWRTD NOWRTC NOWRTB
+   Word  7: 400F   NOEBTR NOEBTRB

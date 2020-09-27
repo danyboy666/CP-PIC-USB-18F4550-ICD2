@@ -1,0 +1,70 @@
+000     @SCRATCH
+001     @SCRATCH
+001     _RETURN_
+002     @SCRATCH
+003     @SCRATCH
+004     @SCRATCH
+005     rapport_cyclique
+006     selection
+007     select_courante
+008     @delay_ms1.P1
+008     main.@SCRATCH1
+009     @PRINTF_U_9600_31766_31767.P1
+009     main.@SCRATCH2
+00A     @PRINTF_U_9600_31766_31767.P1
+00B     @DIV88.P1
+00C     @DIV88.P1
+00D     @DIV88.@SCRATCH1
+F83     PSP_DATA
+FB4.6   C1OUT
+FB4.7   C2OUT
+FBB-FBC CCP_2
+FBB     CCP_2_LOW
+FBC     CCP_2_HIGH
+FBE     CCP_1_LOW
+FBE-FBF CCP_1
+FBF     CCP_1_HIGH
+FE9-FEA @READ_PROGRAM_MEMORY.P1
+FE9-FEA @WRITE_PROGRAM_MEMORY.P2
+FF6-FF8 @WRITE_PROGRAM_MEMORY.P1
+FF6-FF8 @READ_PROGRAM_MEMORY.P2
+
+ROM Allocation:
+0102  @delay_ms1
+012A  main
+0004  @const57
+006E  @DIV88
+0096  @PRINTF_U_9600_31766_31767
+0028  @const64
+004A  @const65
+012A  @cinit
+
+Project Directory:
+    C:\Users\Etudiant\Desktop\Lab 9\Partie 2\
+
+Project Files:
+    PWM sur LED.h.c
+    PWM sur LED.h
+    ..\..\..\..\..\PROGRA~1\PICC\devices\18F4550.h
+
+Units:
+    C:\Users\Etudiant\Desktop\Lab 9\Partie 2\PWM sur LED.h.c (main)
+
+Compiler Settings:
+    Processor:      PIC18F4550
+    Pointer Size:   16
+    ADC Range:      0-255
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+
+Output Files:
+    Errors:      PWM sur LED.h.err
+    Ext Symbols: PWM sur LED.h.esym
+    INHX32:      PWM sur LED.h.hex
+    Symbols:     PWM sur LED.h.sym
+    List:        PWM sur LED.h.lst
+    Debug/COFF:  PWM sur LED.h.cof
+    Project:     PWM sur LED.h.PJT
+    Call Tree:   PWM sur LED.h.tre
+    Statistics:  PWM sur LED.h.sta

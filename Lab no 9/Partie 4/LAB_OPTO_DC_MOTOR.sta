@@ -1,0 +1,48 @@
+
+ROM used: 508 (2%)
+          508 (2%) including unused fragments
+
+          1 Average locations per line
+          21 Average locations per statement
+
+RAM used: 8 (0%) at main() level
+          9 (0%) worst case
+
+Stack used: 1 worst case (out of 31 total available)
+
+Lines Stmts  %   Files
+----- ----- ---  -----
+   78    24 100  LAB_OPTO_DC_MOTOR.c
+   37     0   0  LAB_OPTO_DC_MOTOR.h
+  429     0   0  ..\..\..\..\..\PROGRA~1\PICC\devices\18F4550.h
+----- -----
+  544    24 Total
+
+Page ROM  %  RAM   Vol Diff  Functions:
+---- --- --- ---   --- ----  ----------
+0    304  30   3   796  6.6  main
+0     32   3   0             @const55
+0     34   3   0             @const56
+0     32   3   0             @const57
+0     34   3   0             @const58
+0     68   7   2             @PRINTF_X_9600_31766_31767
+
+Program metrics:
+    Functions               1
+    Statements              24
+    Comments                180
+    Volume (V)              808
+    Difficilty (D)          6.1
+    Effort to implement (E) 4940
+    Time to implement (T)   5 minutes
+    Est Delivered Bugs (B)  0
+    Cyclomatic Complexity   4
+    Maintainability (MI)    131
+
+ Segment     Used  Free
+-----------  ----  ----
+00000-00002     4  0  
+00004-07FFE   504  32260  
+
+
+
